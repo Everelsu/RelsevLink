@@ -15,6 +15,17 @@
     transform: translateY(100vh);
   }
 }
+* {
+  -moz-user-select: -moz-none;
+  -o-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none
+}
+
+.favicon {
+  border-radius: 50%;
+}
 
 body {
   align-items: center;
