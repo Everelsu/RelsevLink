@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>   
+</head>
+
+<body>
+    <div class="container">
+        <div class="rain"></div>
+        <div class="content">
+            <img src="38.png" alt="Avatar" class="avatar">
+            <h1 class="animated-text">Relsev</h1>
+            <div class="buttons">
+                <div class="btn" onclick="window.location.href='//steamcommunity.com/id/everelsu/'">Steam</div>
+                <div class="btn" onclick="window.location.href='//www.youtube.com/@Re1s3v'">YouTube</div>
+                <div class="btn" onclick="window.location.href='//www.tiktok.com/@everelsu'">TikTok</div>
+                <div class="btn" onclick="window.location.href='//t.me/re1sev'">Telegram</div>
+                <div class="btn" onclick="window.location.href='//t.me/steamSaler'">Telegram Channel</div>
+                <div class="btn" onclick="window.location.href='//discord.com/users/490411567620423680'">Discord</div>
+                <div class="btn" onclick="window.location.href='mailto:egor.dagbaev@bk.ru'">egor.dagbaev@bk.ru</div>
+            </div>
+            <div class="copied-message" id="copied-message">Скопировано!</div>
+        </div>
+    </div>
+
+    <script>
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                let msg = document.getElementById("copied-message");
+                msg.classList.add("show");
+                setTimeout(() => {
+                    msg.classList.remove("show");
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
+
