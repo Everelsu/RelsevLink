@@ -1,4 +1,3 @@
-
 function createRaindrops() {
   const rainContainer = document.querySelector('.rain');
   const dropCount = 100;
@@ -12,6 +11,25 @@ function createRaindrops() {
   }
 }
 
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+      let msg = document.getElementById("copied-message");
+      msg.classList.add("show");
+      setTimeout(() => {
+          msg.classList.remove("show");
+      }, 2000);
+  });
+}
+
+
+document.querySelectorAll('.btn').forEach(link => {
+  link.addEventListener('click', (event) => {
+      if (link.href.startsWith('mailto:')) {
+          event.preventDefault(); 
+          copyText(link.href.replace('mailto:', ''));
+      }
+  });
+});
 
 
 window.addEventListener('load', createRaindrops);
