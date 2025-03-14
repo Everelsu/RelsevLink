@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        Relsev - ссылки
-    </title>
-    <link rel="shortcut icon" href="38.png" type="image/x-icon", class="Avatar">
+    <title>Relsev - ссылки</title>
+    <link rel="shortcut icon" href="38.png" type="image/x-icon" class="Avatar">
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>   
 </head>
@@ -18,29 +16,17 @@
             <img src="38.png" alt="Avatar" class="avatar">
             <h1 class="animated-text">Relsev</h1>
             <div class="buttons">
-                <div class="btn" onclick="window.location.href='//steamcommunity.com/id/everelsu/'">Steam</div>
-                <div class="btn" onclick="window.location.href='//www.youtube.com/@Re1s3v'">YouTube</div>
-                <div class="btn" onclick="window.location.href='//www.tiktok.com/@everelsu'">TikTok</div>
-                <div class="btn" onclick="window.location.href='//t.me/re1sev'">Telegram</div>
-                <div class="btn" onclick="window.location.href='//t.me/steamSaler'">Telegram Channel</div>
-                <div class="btn" onclick="window.location.href='//discord.com/users/490411567620423680'">Discord</div>
-                <div class="btn" onclick="window.location.href='mailto:egor.dagbaev@bk.ru'">egor.dagbaev@bk.ru</div>
+                <a href="//steamcommunity.com/id/everelsu/" class="btn">Steam</a>
+                <a href="//www.youtube.com/@Re1s3v" class="btn">YouTube</a>
+                <a href="//www.tiktok.com/@everelsu" class="btn">TikTok</a>
+                <a href="//t.me/re1sev" class="btn">Telegram</a>
+                <a href="//t.me/steamSaler" class="btn">Telegram Channel</a>
+                <a href="//discord.com/users/490411567620423680" class="btn">Discord</a>
+                <a href="mailto:egor.dagbaev@bk.ru" class="btn">egor.dagbaev@bk.ru</a>
             </div>
             <div class="copied-message" id="copied-message">Скопировано!</div>
         </div>
     </div>
 
-    <script>
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                let msg = document.getElementById("copied-message");
-                msg.classList.add("show");
-                setTimeout(() => {
-                    msg.classList.remove("show");
-                }, 2000);
-            });
-        }
-    </script>
 </body>
 </html>
-
