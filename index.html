@@ -3,43 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relsev</title>
+    <title>Relsev - ссылки</title>
     <link rel="shortcut icon" href="avatar.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="script.js" defer></script>   
 </head>
 
 <body>
-    <div class="crt-screen">
-        <div class="screen-border">
-            <div class="power-button"></div>
+    <div class="container">
+        <div class="content">
+            <div class="system-header">
+                <span class="system-text">Re OS v1.0</span>
+                <span class="date-text"></span>
+            </div>
+            <div class="command-line">
+                <span class="prompt">C:\></span>
+                <span class="command"></span>
+                <span class="cursor">_</span>
+            </div>
+            <img src="avatar.png" alt="Avatar" class="avatar" id="avatar">
+            <h1 class="animated-text" data-text="Relsev">Relsev</h1>
+            <div class="buttons">
+                <a href="//steamcommunity.com/id/everelsu/" class="btn">> Steam</a>
+                <a href="//www.youtube.com/@Re1s3v" class="btn">> YouTube</a>
+                <a href="//www.tiktok.com/@everelsu" class="btn">> TikTok</a>
+                <a href="//t.me/re1sev" class="btn">> Telegram</a>
+                <a href="//t.me/steamSaler" class="btn">> Telegram Channel</a>
+                <a href="//www.reddit.com/user/Relsev" class="btn">> Reddit</a>
+                <a href="//discord.com/users/490411567620423680" class="btn">> Discord</a>
+                <a href="mailto:egor.dagbaev@bk.ru" class="btn">> egor.dagbaev@bk.ru</a>
+            </div>
             <div class="screen-controls">
                 <div class="control-knob" data-control="brightness"></div>
                 <div class="control-knob" data-control="contrast"></div>
                 <div class="control-knob" data-control="color"></div>
             </div>
-            <div class="system-header">
-                <div class="system-text">Relsev OS v1.0</div>
-                <div class="date-text" id="date"></div>
-            </div>
-            <div class="command-line">
-                <span class="prompt">></span>
-                <span class="command"></span>
-                <span class="cursor"></span>
-            </div>
-            <div class="content">
-                <img src="avatar.png" alt="Avatar" class="avatar" id="avatar">
-                <h1 class="animated-text" id="title">Relsev</h1>
-                <div class="buttons">
-                    <a href="mailto:relsev@proton.me" class="btn">relsev@proton.me</a>
-                    <a href="https://t.me/relsev" class="btn">Telegram</a>
-                    <a href="https://github.com/relsev" class="btn">GitHub</a>
-                </div>
-            </div>
+            <div class="power-button"></div>
         </div>
     </div>
     <div class="copied-message">Скопировано!</div>
-    <div class="secret-message">Секретный режим активирован!</div>
-    <script src="script.js"></script>
+    <div class="secret-message"></div>
+    <audio id="clickSound" src="click.mp3"></audio>
+    <audio id="clickedSound" src="clicked.mp3"></audio>
+    <audio id="startupSound" src="oldpcbutton.mp3"></audio>
+    <audio id="glitchSound" src="glitch.mp3"></audio>
 </body>
 </html>

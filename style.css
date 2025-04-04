@@ -597,81 +597,109 @@ body::before {
 /* Медиа-запросы для мобильных устройств */
 @media (max-width: 768px) {
   body {
-    padding: 10px;
+    padding: 0;
+    margin: 0;
     overflow-x: hidden;
+    min-height: 100vh;
+    touch-action: manipulation;
   }
 
   .crt-screen {
     width: 100%;
-    height: auto;
-    min-height: 100vh;
-    padding: 10px;
+    height: 100vh;
+    padding: 0;
     margin: 0;
+    border-radius: 0;
+    overflow: hidden;
   }
 
   .screen-border {
-    padding: 15px;
-    border-width: 15px;
-    border-top-width: 30px;
+    padding: 10px;
+    border-width: 10px;
+    border-top-width: 20px;
+    min-height: 100vh;
+    position: relative;
   }
 
   .content {
     padding: 10px;
+    gap: 15px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .avatar {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     margin: 10px auto;
+    touch-action: manipulation;
   }
 
   .buttons {
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 8px;
+    margin-top: 15px;
+    width: 100%;
+    padding: 0 10px;
   }
 
   .btn {
     width: 100%;
-    max-width: none;
     padding: 12px;
-    font-size: 1rem;
-    margin: 5px 0;
+    font-size: 0.9rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .system-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 5px;
+    padding: 5px;
+    position: relative;
+    z-index: 1;
   }
 
   .date-text {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .command-line {
     margin: 0.5rem 0;
     padding: 0.5rem;
-    min-height: 60px;
-    font-size: 1rem;
+    min-height: 40px;
+    font-size: 0.9rem;
+    display: none;
   }
 
   .screen-controls {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 15px;
+    right: 15px;
     flex-direction: column;
     gap: 10px;
+    z-index: 1000;
+    touch-action: manipulation;
   }
 
   .control-knob {
     width: 20px;
     height: 20px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .power-button {
     top: 10px;
     right: 10px;
+    width: 20px;
+    height: 20px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Оптимизация анимаций для мобильных */
@@ -685,7 +713,8 @@ body::before {
   /* Отключение некоторых эффектов на мобильных */
   .crt-screen::before,
   .command-line::before,
-  .noise {
+  .noise,
+  .scanline {
     display: none;
   }
 
@@ -698,20 +727,74 @@ body::before {
   .btn:hover {
     transform: none !important;
   }
-}
 
-/* Оптимизация загрузки */
-@media (max-width: 480px) {
+  /* Исправление наложения элементов */
+  .content > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .screen-controls {
+    z-index: 2;
+  }
+
+  /* Улучшение читаемости текста */
   .animated-text {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    line-height: 1.2;
   }
 
   .system-text {
     font-size: 0.8rem;
   }
 
+  /* Улучшение кнопок */
+  .btn:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+
+  .control-knob:active {
+    transform: rotate(90deg);
+  }
+
+  .power-button:active {
+    transform: scale(0.9);
+  }
+}
+
+/* Оптимизация загрузки */
+@media (max-width: 480px) {
+  .animated-text {
+    font-size: 1rem;
+  }
+
+  .system-text {
+    font-size: 0.7rem;
+  }
+
   .command-line {
     display: none;
+  }
+
+  .btn {
+    padding: 10px;
+    font-size: 0.8rem;
+  }
+
+  .screen-controls {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .control-knob {
+    width: 18px;
+    height: 18px;
+  }
+
+  .power-button {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -818,4 +901,35 @@ body::before {
   0% { opacity: 1; }
   50% { opacity: 0.9; }
   100% { opacity: 1; }
+}
+
+/* Улучшение кнопок для всех устройств */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.btn:hover::after {
+  transform: translateX(0);
+}
+
+.control-knob {
+  transition: transform 0.2s ease;
+}
+
+.power-button {
+  transition: transform 0.2s ease;
 }
