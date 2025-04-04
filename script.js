@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentCommand++;
             } else {
                 clearInterval(interval);
-                setTimeout(() => {
+      setTimeout(() => {
                     if (commandText) {
                         commandText.textContent = '';
                     }
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 1000);
             }
-        }, 2000);
+      }, 2000);
     }
 
     // Оптимизированная анимация появления элементов
@@ -339,9 +339,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         copiedMessage.classList.remove('show');
                     }, 2000);
                 });
-            }
-        });
-    });
+      }
+  });
+});
 
     // Функция создания эффекта мерцания CRT
     function createCRTEffect() {

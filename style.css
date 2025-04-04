@@ -601,77 +601,129 @@ body::before {
     margin: 0;
     overflow: hidden;
     min-height: 100vh;
-    touch-action: none;
+    touch-action: manipulation;
     position: fixed;
     width: 100%;
     height: 100%;
+    background: var(--primary-color);
+  }
+
+  .container {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .crt-screen {
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
     border-radius: 0;
     overflow: hidden;
     position: fixed;
-    width: 100%;
-    height: 100%;
+    background: var(--primary-color);
   }
 
   .screen-border {
+    width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
     border-radius: 0;
-    height: 100vh;
-    overflow: hidden;
+    border: none;
+    background: var(--primary-color);
   }
 
   .content {
-    padding: 20px;
-    margin: 0;
-    height: 100vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    position: fixed;
     width: 100%;
     height: 100%;
+    padding: 20px;
+    margin: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background: var(--primary-color);
   }
 
   .avatar {
     width: 120px;
     height: 120px;
     margin: 20px auto;
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 10px var(--shadow-color);
+  }
+
+  .buttons {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px auto;
   }
 
   .btn {
     width: 100%;
-    max-width: 300px;
-    margin: 10px auto;
     padding: 15px 20px;
     font-size: 16px;
+    margin: 0;
+    background: transparent;
+    color: var(--text-color);
+    border: 2px solid var(--accent-color);
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
     touch-action: manipulation;
   }
 
-  .btn:hover {
-    transform: none;
-    background: var(--accent-color);
-    color: var(--primary-color);
-    text-shadow: none;
-    box-shadow: 
-        0 0 20px var(--shadow-color),
-        inset 0 0 20px var(--shadow-color);
+  .btn::before {
+    content: ">";
+    position: absolute;
+    left: 10px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 255, 0, 0.1) 50%,
+      transparent 100%
+    );
+    animation: btn-scan 3s infinite;
   }
 
   .btn:active {
     transform: scale(0.95);
-    opacity: 0.8;
+    background: var(--accent-color);
+    color: var(--primary-color);
+    box-shadow: 
+      0 0 20px var(--shadow-color),
+      inset 0 0 20px var(--shadow-color);
+  }
+
+  .btn:active::before {
+    opacity: 1;
   }
 
   /* Убираем мини-кнопки */
-  .screen-controls {
-    display: none;
-  }
-
+  .screen-controls,
   .power-button {
     display: none;
   }
@@ -685,7 +737,18 @@ body::before {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border: 2px solid var(--accent-color);
+    border-radius: 0;
     z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .copied-message.show {
+    opacity: 1;
   }
 
   .secret-message {
@@ -693,7 +756,18 @@ body::before {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border: 2px solid var(--accent-color);
+    border-radius: 0;
     z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .secret-message.show {
+    opacity: 1;
   }
 
   /* Отключаем тяжелые эффекты на мобильных */
@@ -707,12 +781,24 @@ body::before {
   /* Улучшаем читаемость текста */
   h1, h2, p {
     text-shadow: none;
+    text-align: center;
+  }
+
+  .animated-text {
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .system-text {
+    font-size: 0.9rem;
+    text-align: center;
   }
 
   /* Оптимизируем анимации */
   * {
     animation: none !important;
-    transition: none !important;
+    transition: all 0.2s ease !important;
   }
 }
 
@@ -727,9 +813,22 @@ body::before {
     padding: 12px 15px;
     font-size: 14px;
   }
+
+  .animated-text {
+    font-size: 1.2rem;
+  }
+
+  .system-text {
+    font-size: 0.8rem;
+  }
 }
 
 /* Стили для мобильного режима */
+.mobile-mode {
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
 .mobile-mode .btn {
   transform: none !important;
   box-shadow: none !important;
@@ -737,27 +836,23 @@ body::before {
 
 .mobile-mode .btn:active {
   transform: scale(0.95) !important;
-  opacity: 0.8;
   background: var(--accent-color);
   color: var(--primary-color);
-  text-shadow: none;
   box-shadow: 
-      0 0 20px var(--shadow-color),
-      inset 0 0 20px var(--shadow-color);
+    0 0 20px var(--shadow-color),
+    inset 0 0 20px var(--shadow-color);
 }
 
 /* Улучшаем отзывчивость кнопок на мобильных */
 @media (hover: none) {
   .btn:active {
     transform: scale(0.95);
-    opacity: 0.8;
+    background: var(--accent-color);
+    color: var(--primary-color);
+    box-shadow: 
+      0 0 20px var(--shadow-color),
+      inset 0 0 20px var(--shadow-color);
   }
-}
-
-/* Убираем мини-кнопки для всех устройств */
-.screen-controls,
-.power-button {
-  display: none;
 }
 
 /* Десктоп версия */
