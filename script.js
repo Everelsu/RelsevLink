@@ -56,12 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     } else {
-        // Создаем аудио элементы только для десктопа
-        const clickSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-        const clickedSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-        const startupSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
-        const glitchSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+        // Создаем пустые аудио элементы для GitHub
+        const clickSound = new Audio();
+        const clickedSound = new Audio();
+        const startupSound = new Audio();
+        const glitchSound = new Audio();
         
+        // Устанавливаем громкость
         clickSound.volume = 0.3;
         clickedSound.volume = 0.3;
         startupSound.volume = 0.5;
@@ -70,10 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Улучшенная функция перезагрузки
     function rebootSystem() {
-        if (!isMobile) {
-            startupSound.play();
-        }
-
         // Скрываем контент с анимацией
         content.style.transition = 'opacity 0.5s ease';
         content.style.opacity = '0';
@@ -161,28 +158,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Обработчик кнопки питания
-    powerButton.addEventListener('click', rebootSystem);
+    if (powerButton) {
+        powerButton.addEventListener('click', rebootSystem);
+        if (isMobile) {
+            powerButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                powerButton.style.transform = 'scale(0.95)';
+            });
+            powerButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                powerButton.style.transform = 'scale(1)';
+            });
+        }
+    }
 
     // Обработчики регуляторов
-    controlKnobs.forEach(knob => {
-        knob.addEventListener('click', () => {
-            const control = knob.dataset.control;
-            switch(control) {
-                case 'brightness':
-                    content.style.filter = 'brightness(1.5)';
-                    break;
-                case 'contrast':
-                    content.style.filter = 'contrast(1.5)';
-                    break;
-                case 'color':
-                    content.style.filter = 'hue-rotate(90deg)';
-                    break;
-            }
-            setTimeout(() => {
-                content.style.filter = 'none';
-            }, 1000);
+    if (controlKnobs) {
+        controlKnobs.forEach(knob => {
+            knob.addEventListener('click', () => {
+                const control = knob.dataset.control;
+                switch(control) {
+                    case 'brightness':
+                        content.style.filter = 'brightness(1.5)';
+                        break;
+                    case 'contrast':
+                        content.style.filter = 'contrast(1.5)';
+                        break;
+                    case 'color':
+                        content.style.filter = 'hue-rotate(90deg)';
+                        break;
+                }
+                setTimeout(() => {
+                    content.style.filter = 'none';
+                }, 1000);
+            });
         });
-    });
+    }
+
+    // Обработчики кнопок
+    if (buttons) {
+        buttons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (button.href.startsWith('mailto:')) {
+                    e.preventDefault();
+                    const email = button.href.replace('mailto:', '');
+                    navigator.clipboard.writeText(email).then(() => {
+                        if (copiedMessage) {
+                            copiedMessage.classList.add('show');
+                            setTimeout(() => {
+                                copiedMessage.classList.remove('show');
+                            }, 2000);
+                        }
+                    });
+                }
+            });
+        });
+    }
 
     // Инициализация
     updateDateTime();
