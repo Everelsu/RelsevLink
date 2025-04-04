@@ -7,67 +7,90 @@ document.addEventListener('DOMContentLoaded', () => {
     const commandText = document.querySelector('.command');
     const powerButton = document.querySelector('.power-button');
     const controlKnobs = document.querySelectorAll('.control-knob');
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const cursor = document.querySelector('.cursor');
     const copiedMessage = document.querySelector('.copied-message');
     const secretMessage = document.querySelector('.secret-message');
 
-    // Оптимизация для мобильных устройств
-    if (isMobile) {
-        document.body.classList.add('mobile-mode');
-        setInterval(updateDateTime, 30000);
-        
-        // Отключаем звуки на мобильных
-        const clickSound = { play: () => {} };
-        const clickedSound = { play: () => {} };
-        const startupSound = { play: () => {} };
-        const glitchSound = { play: () => {} };
+    // Создаем пустые аудио элементы для GitHub
+    const clickSound = new Audio();
+    const clickedSound = new Audio();
+    const startupSound = new Audio();
+    const glitchSound = new Audio();
+    
+    // Устанавливаем громкость
+    clickSound.volume = 0.3;
+    clickedSound.volume = 0.3;
+    startupSound.volume = 0.5;
+    glitchSound.volume = 0.4;
 
-        // Отключаем консоль на мобильных
-        if (commandText) {
-            commandText.style.display = 'none';
-        }
-
-        // Улучшенная обработка касаний для кнопок
-        buttons.forEach(button => {
-            button.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                button.style.transform = 'scale(0.95)';
-                button.style.opacity = '0.8';
-            });
-
-            button.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                button.style.transform = 'scale(1)';
-                button.style.opacity = '1';
-            });
+    // Обработчики кнопок
+    buttons.forEach(button => {
+        // Обработка наведения
+        button.addEventListener('mouseenter', () => {
+            button.style.transform = 'translateX(10px)';
+            button.style.background = 'var(--accent-color)';
+            button.style.color = 'var(--primary-color)';
+            button.style.boxShadow = '0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color)';
         });
 
-        // Улучшенная обработка касаний для регуляторов
-        controlKnobs.forEach(knob => {
-            knob.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                knob.style.transform = 'rotate(90deg)';
-            });
-
-            knob.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                knob.style.transform = 'rotate(0deg)';
-            });
+        // Обработка ухода курсора
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = 'translateX(0)';
+            button.style.background = 'transparent';
+            button.style.color = 'var(--text-color)';
+            button.style.boxShadow = '0 0 10px var(--shadow-color), inset 0 0 10px var(--shadow-color)';
         });
-    } else {
-        // Создаем пустые аудио элементы для GitHub
-        const clickSound = new Audio();
-        const clickedSound = new Audio();
-        const startupSound = new Audio();
-        const glitchSound = new Audio();
-        
-        // Устанавливаем громкость
-        clickSound.volume = 0.3;
-        clickedSound.volume = 0.3;
-        startupSound.volume = 0.5;
-        glitchSound.volume = 0.4;
+
+        // Обработка клика
+        button.addEventListener('click', (e) => {
+            if (button.href.startsWith('mailto:')) {
+                e.preventDefault();
+                const email = button.href.replace('mailto:', '');
+                navigator.clipboard.writeText(email).then(() => {
+                    if (copiedMessage) {
+                        copiedMessage.classList.add('show');
+                        setTimeout(() => {
+                            copiedMessage.classList.remove('show');
+                        }, 2000);
+                    }
+                });
+            }
+        });
+    });
+
+    // Обработчики мини-кнопок
+    if (powerButton) {
+        powerButton.addEventListener('click', rebootSystem);
     }
+
+    if (controlKnobs) {
+        controlKnobs.forEach(knob => {
+            knob.addEventListener('click', () => {
+                const control = knob.dataset.control;
+                switch(control) {
+                    case 'brightness':
+                        content.style.filter = 'brightness(1.5)';
+                        break;
+                    case 'contrast':
+                        content.style.filter = 'contrast(1.5)';
+                        break;
+                    case 'color':
+                        content.style.filter = 'hue-rotate(90deg)';
+                        break;
+                }
+                setTimeout(() => {
+                    content.style.filter = 'none';
+                }, 1000);
+            });
+        });
+    }
+
+    // Инициализация
+    updateDateTime();
+    createScanline();
+    createCRTEffect();
+    createNoise();
+    systemBoot();
 
     // Улучшенная функция перезагрузки
     function rebootSystem() {
@@ -157,73 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Обработчик кнопки питания
-    if (powerButton) {
-        powerButton.addEventListener('click', rebootSystem);
-        if (isMobile) {
-            powerButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                powerButton.style.transform = 'scale(0.95)';
-            });
-            powerButton.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                powerButton.style.transform = 'scale(1)';
-            });
-        }
-    }
-
-    // Обработчики регуляторов
-    if (controlKnobs) {
-        controlKnobs.forEach(knob => {
-            knob.addEventListener('click', () => {
-                const control = knob.dataset.control;
-                switch(control) {
-                    case 'brightness':
-                        content.style.filter = 'brightness(1.5)';
-                        break;
-                    case 'contrast':
-                        content.style.filter = 'contrast(1.5)';
-                        break;
-                    case 'color':
-                        content.style.filter = 'hue-rotate(90deg)';
-                        break;
-                }
-                setTimeout(() => {
-                    content.style.filter = 'none';
-                }, 1000);
-            });
-        });
-    }
-
-    // Обработчики кнопок
-    if (buttons) {
-        buttons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                if (button.href.startsWith('mailto:')) {
-                    e.preventDefault();
-                    const email = button.href.replace('mailto:', '');
-                    navigator.clipboard.writeText(email).then(() => {
-                        if (copiedMessage) {
-                            copiedMessage.classList.add('show');
-                            setTimeout(() => {
-                                copiedMessage.classList.remove('show');
-                            }, 2000);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    // Инициализация
-    updateDateTime();
-    if (!isMobile) {
-        createScanline();
-        createCRTEffect();
-        createNoise();
-    }
-    systemBoot();
-
     // Оптимизированная функция обновления даты и времени
     function updateDateTime() {
         const now = new Date();
@@ -234,14 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
             hour: '2-digit',
             minute: '2-digit'
         };
-        if (!isMobile) {
-            options.second = '2-digit';
-        }
         dateText.textContent = now.toLocaleDateString('ru-RU', options);
     }
 
     // Оптимизированная функция печатания текста
-    function typeWriter(text, element, speed = isMobile ? 50 : 30) {
+    function typeWriter(text, element, speed = 30) {
         if (!element) return;
         let i = 0;
         element.textContent = '';
@@ -258,11 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Оптимизированная функция загрузки системы
     function systemBoot() {
-        if (isMobile) {
-            content.style.opacity = '1';
-            return;
-        }
-
         const commands = [
             '> Загрузка системы...',
             '> Проверка памяти...',
@@ -279,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentCommand++;
             } else {
                 clearInterval(interval);
-      setTimeout(() => {
+                setTimeout(() => {
                     if (commandText) {
                         commandText.textContent = '';
                     }
@@ -288,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 1000);
             }
-      }, 2000);
+        }, 2000);
     }
 
     // Оптимизированная анимация появления элементов
@@ -298,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 element.style.opacity = '1';
                 element.style.transform = 'translateY(0)';
-            }, isMobile ? index * 100 : index * 200);
+            }, index * 200);
         });
     }
 
@@ -318,17 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Эффект при наведении на кнопки
     buttons.forEach(button => {
         button.addEventListener('mouseenter', () => {
-            if (!isMobile) {
-                clickSound.currentTime = 0;
-                clickSound.play();
-            }
+            clickSound.currentTime = 0;
+            clickSound.play();
         });
 
         button.addEventListener('click', (e) => {
-            if (!isMobile) {
-                clickedSound.currentTime = 0;
-                clickedSound.play();
-            }
+            clickedSound.currentTime = 0;
+            clickedSound.play();
 
             if (button.href.startsWith('mailto:')) {
                 e.preventDefault();
@@ -339,9 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         copiedMessage.classList.remove('show');
                     }, 2000);
                 });
-      }
-  });
-});
+            }
+        });
+    });
 
     // Функция создания эффекта мерцания CRT
     function createCRTEffect() {

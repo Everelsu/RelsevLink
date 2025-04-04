@@ -62,7 +62,7 @@ body::before {
 .container {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   z-index: 1;
@@ -75,7 +75,7 @@ body::before {
   background: rgba(0, 0, 0, 0.8);
   border: 2px solid var(--accent-color);
   border-radius: 0;
-  padding: 2rem;
+  padding: 3rem;
   box-shadow: 
     0 0 20px rgba(0, 255, 0, 0.3),
     inset 0 0 20px rgba(0, 255, 0, 0.1);
@@ -131,8 +131,8 @@ body::before {
 }
 
 .avatar {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border-radius: 0;
   border: 2px solid var(--accent-color);
   margin: 0 auto 1.5rem;
@@ -195,7 +195,7 @@ body::before {
 
 .animated-text {
   color: var(--text-color);
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin-bottom: 2rem;
   text-align: center;
   text-shadow: 
@@ -222,22 +222,15 @@ body::before {
 .btn {
   background: transparent;
   color: var(--text-color);
-  padding: 1rem;
+  padding: 1rem 2rem;
   border: 2px solid var(--accent-color);
   text-decoration: none;
   text-align: center;
-  font-size: 1.2rem;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  letter-spacing: 1px;
   text-shadow: 0 0 5px var(--accent-color);
-  box-shadow: 
-    0 0 10px var(--shadow-color),
-    inset 0 0 10px var(--shadow-color);
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+  box-shadow: 0 0 10px var(--shadow-color), inset 0 0 10px var(--shadow-color);
 }
 
 .btn::before {
@@ -247,6 +240,7 @@ body::before {
   opacity: 0;
   transition: all 0.3s ease;
   text-shadow: 0 0 5px var(--accent-color);
+  pointer-events: none;
 }
 
 .btn::after {
@@ -263,6 +257,7 @@ body::before {
     transparent 100%
   );
   animation: btn-scan 3s infinite;
+  pointer-events: none;
 }
 
 @keyframes btn-scan {
@@ -273,11 +268,8 @@ body::before {
 .btn:hover {
   background: var(--accent-color);
   color: var(--primary-color);
-  text-shadow: none;
   transform: translateX(10px);
-  box-shadow: 
-    0 0 20px var(--shadow-color),
-    inset 0 0 20px var(--shadow-color);
+  box-shadow: 0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color);
 }
 
 .btn:hover::before {
@@ -286,9 +278,9 @@ body::before {
 
 .copied-message {
   position: fixed;
-  top: 20px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   background: var(--primary-color);
   color: var(--text-color);
   padding: 1rem 2rem;
@@ -594,290 +586,98 @@ body::before {
   50% { opacity: 0; }
 }
 
-/* Медиа-запросы для мобильных устройств */
+/* Удаляем только мобильные стили */
 @media (max-width: 768px) {
-  body {
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    min-height: 100vh;
-    touch-action: manipulation;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: var(--primary-color);
-  }
-
-  .container {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .crt-screen {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    border-radius: 0;
-    overflow: hidden;
-    position: fixed;
-    background: var(--primary-color);
-  }
-
-  .screen-border {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    border-radius: 0;
-    border: none;
-    background: var(--primary-color);
-  }
-
-  .content {
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    margin: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    background: var(--primary-color);
-  }
-
-  .avatar {
-    width: 120px;
-    height: 120px;
-    margin: 20px auto;
-    border: 2px solid var(--accent-color);
-    box-shadow: 0 0 10px var(--shadow-color);
-  }
-
-  .buttons {
-    width: 100%;
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin: 20px auto;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 15px 20px;
-    font-size: 16px;
-    margin: 0;
-    background: transparent;
-    color: var(--text-color);
-    border: 2px solid var(--accent-color);
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    touch-action: manipulation;
-  }
-
-  .btn::before {
-    content: ">";
-    position: absolute;
-    left: 10px;
-    opacity: 0;
-    transition: all 0.3s ease;
-  }
-
-  .btn::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(0, 255, 0, 0.1) 50%,
-      transparent 100%
-    );
-    animation: btn-scan 3s infinite;
-  }
-
-  .btn:active {
-    transform: scale(0.95);
-    background: var(--accent-color);
-    color: var(--primary-color);
-    box-shadow: 
-      0 0 20px var(--shadow-color),
-      inset 0 0 20px var(--shadow-color);
-  }
-
-  .btn:active::before {
-    opacity: 1;
-  }
-
-  /* Убираем мини-кнопки */
-  .screen-controls,
-  .power-button {
-    display: none;
-  }
-
-  .command-line {
-    display: none;
-  }
-
-  .copied-message {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: var(--text-color);
-    padding: 10px 20px;
-    border: 2px solid var(--accent-color);
-    border-radius: 0;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .copied-message.show {
-    opacity: 1;
-  }
-
-  .secret-message {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: var(--text-color);
-    padding: 10px 20px;
-    border: 2px solid var(--accent-color);
-    border-radius: 0;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .secret-message.show {
-    opacity: 1;
-  }
-
-  /* Отключаем тяжелые эффекты на мобильных */
-  .crt-screen::before,
-  .crt-screen::after,
-  .scanline,
-  .noise {
-    display: none;
-  }
-
-  /* Улучшаем читаемость текста */
-  h1, h2, p {
-    text-shadow: none;
-    text-align: center;
-  }
-
-  .animated-text {
-    font-size: 1.5rem;
-    text-align: center;
-    margin: 10px 0;
-  }
-
-  .system-text {
-    font-size: 0.9rem;
-    text-align: center;
-  }
-
-  /* Оптимизируем анимации */
-  * {
-    animation: none !important;
-    transition: all 0.2s ease !important;
-  }
+  /* Удаляем все стили внутри медиа-запроса */
 }
 
-/* Дополнительные стили для очень маленьких экранов */
 @media (max-width: 480px) {
-  .avatar {
-    width: 100px;
-    height: 100px;
-  }
-
-  .btn {
-    padding: 12px 15px;
-    font-size: 14px;
-  }
-
-  .animated-text {
-    font-size: 1.2rem;
-  }
-
-  .system-text {
-    font-size: 0.8rem;
-  }
+  /* Удаляем все стили внутри медиа-запроса */
 }
 
-/* Стили для мобильного режима */
+/* Удаляем классы для мобильного режима */
 .mobile-mode {
+  /* Удаляем все стили */
+}
+
+/* Удаляем стили для touch-устройств */
+@media (hover: none) {
+  /* Удаляем все стили */
+}
+
+/* Возвращаем стандартные стили для ПК */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.content {
+  padding: 3rem;
+}
+
+.avatar {
+  width: 200px;
+  height: 200px;
+}
+
+.animated-text {
+  font-size: 3rem;
+}
+
+.btn {
+  font-size: 1.2rem;
+  padding: 1rem;
+}
+
+/* Возвращаем стандартные стили для кнопок */
+.btn {
+  background: transparent;
+  color: var(--text-color);
+  padding: 1rem 2rem;
+  border: 2px solid var(--accent-color);
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
-  touch-action: manipulation;
+  text-shadow: 0 0 5px var(--accent-color);
+  box-shadow: 0 0 10px var(--shadow-color), inset 0 0 10px var(--shadow-color);
 }
 
-.mobile-mode .btn {
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.mobile-mode .btn:active {
-  transform: scale(0.95) !important;
+.btn:hover {
   background: var(--accent-color);
   color: var(--primary-color);
-  box-shadow: 
-    0 0 20px var(--shadow-color),
-    inset 0 0 20px var(--shadow-color);
+  transform: translateX(10px);
+  box-shadow: 0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color);
 }
 
-/* Улучшаем отзывчивость кнопок на мобильных */
-@media (hover: none) {
-  .btn:active {
-    transform: scale(0.95);
-    background: var(--accent-color);
-    color: var(--primary-color);
-    box-shadow: 
-      0 0 20px var(--shadow-color),
-      inset 0 0 20px var(--shadow-color);
-  }
+/* Возвращаем стандартные стили для эффектов */
+.crt-screen::before,
+.crt-screen::after,
+.scanline,
+.noise {
+  display: block;
 }
 
-/* Десктоп версия */
-@media (min-width: 769px) {
-  .container {
-    max-width: 800px;
-  }
+/* Возвращаем стандартные стили для текста */
+h1, h2, p {
+  text-shadow: 0 0 10px var(--accent-color);
+}
 
-  .content {
-    padding: 3rem;
-  }
+/* Возвращаем стандартные стили для сообщений */
+.copied-message,
+.secret-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
-  .avatar {
-    width: 200px;
-    height: 200px;
-  }
-
-  .animated-text {
-    font-size: 3rem;
-  }
-
-  .btn {
-    font-size: 1.2rem;
-    padding: 1rem;
-  }
+/* Возвращаем стандартные анимации */
+* {
+  animation: none;
+  transition: all 0.3s ease;
 }
 
 .secret-mode {
