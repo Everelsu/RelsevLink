@@ -2,9 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const avatar = document.getElementById('avatar');
     const title = document.getElementById('title');
     const buttons = document.querySelectorAll('.btn');
-    const clickSound = document.getElementById('clickSound');
-    const clickedSound = document.getElementById('clickedSound');
-    const startupSound = document.getElementById('startupSound');
     const content = document.querySelector('.content');
     const dateText = document.getElementById('date');
     const commandText = document.querySelector('.command');
@@ -14,43 +11,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursor = document.querySelector('.cursor');
     const copiedMessage = document.querySelector('.copied-message');
     const secretMessage = document.querySelector('.secret-message');
-    const glitchSound = document.getElementById('glitchSound');
 
-    // Секретный код
-    let konamiCode = [];
-    const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-
-    // Счетчик кликов по аватарке
-    let avatarClickCount = 0;
-
-    // Флаги активных режимов
-    let isSecretModeActive = false;
-    let isGlitchModeActive = false;
-
-    // Воспроизводим звук запуска только на десктопе
-    if (!isMobile) {
+    // Оптимизация для мобильных устройств
+    if (isMobile) {
+        // Отключаем тяжелые эффекты
+        document.body.classList.add('mobile-mode');
+        
+        // Уменьшаем частоту обновления времени
+        setInterval(updateDateTime, 30000); // Каждые 30 секунд вместо 1 секунды
+        
+        // Отключаем звуки
+        const clickSound = { play: () => {} };
+        const clickedSound = { play: () => {} };
+        const startupSound = { play: () => {} };
+        const glitchSound = { play: () => {} };
+    } else {
+        // Создаем аудио элементы только для десктопа
+        const clickSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+        const clickedSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+        const startupSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+        const glitchSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+        
+        // Устанавливаем громкость
+        clickSound.volume = 0.3;
+        clickedSound.volume = 0.3;
         startupSound.volume = 0.5;
-        startupSound.play();
+        glitchSound.volume = 0.4;
     }
 
-    // Обновление даты и времени
+    // Оптимизированная функция обновления даты и времени
     function updateDateTime() {
         const now = new Date();
-        const date = now.toLocaleDateString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-        const time = now.toLocaleTimeString('ru-RU', {
+        const options = { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
             hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-        dateText.textContent = `${date} ${time}`;
+            minute: '2-digit'
+        };
+        if (!isMobile) {
+            options.second = '2-digit';
+        }
+        dateText.textContent = now.toLocaleDateString('ru-RU', options);
     }
 
-    // Функция анимации печатания текста
-    function typeWriter(text, element, speed = 30) {
+    // Оптимизированная функция печатания текста
+    function typeWriter(text, element, speed = isMobile ? 50 : 30) {
         let i = 0;
         element.textContent = '';
         const interval = setInterval(() => {
@@ -64,8 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return interval;
     }
 
-    // Обновляем функцию systemBoot для использования анимации печатания
+    // Оптимизированная функция загрузки системы
     function systemBoot() {
+        if (isMobile) {
+            content.style.opacity = '1';
+            return;
+        }
+
         const commands = [
             '> Загрузка системы...',
             '> Проверка памяти...',
@@ -90,91 +101,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     }
 
-    // Активация секретного режима
-    function activateSecretMode() {
-        if (!isSecretModeActive) {
-            isSecretModeActive = true;
-            document.body.classList.add('secret-mode');
-            secretMessage.textContent = 'Секретный режим активирован!';
-            secretMessage.classList.add('show');
-            
-            // Изменяем стили для всех элементов
-            content.style.filter = 'hue-rotate(180deg)';
-            buttons.forEach(button => {
-                button.style.borderColor = '#ff00ff';
-                button.style.boxShadow = '0 0 20px #ff00ff';
-            });
-            
-            // Добавляем эффект мерцания
-            const flickerInterval = setInterval(() => {
-                if (!isSecretModeActive) {
-                    clearInterval(flickerInterval);
-                    return;
-                }
-                content.style.opacity = Math.random() * 0.2 + 0.8;
-            }, 100);
-            
-            // Автоматическое отключение через 30 секунд
+    // Инициализация
+    updateDateTime();
+    if (!isMobile) {
+        createScanline();
+        createCRTEffect();
+        createNoise();
+    }
+    systemBoot();
+
+    // Оптимизированная анимация появления элементов
+    function animateElements() {
+        const elements = document.querySelectorAll('.content > *');
+        elements.forEach((element, index) => {
             setTimeout(() => {
-                deactivateSecretMode();
-            }, 30000);
-        }
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, isMobile ? index * 100 : index * 200);
+        });
     }
 
-    // Деактивация секретного режима
-    function deactivateSecretMode() {
-        if (isSecretModeActive) {
-            isSecretModeActive = false;
-            document.body.classList.remove('secret-mode');
-            secretMessage.classList.remove('show');
-            content.style.filter = 'none';
-            content.style.opacity = '1';
-            buttons.forEach(button => {
-                button.style.borderColor = '';
-                button.style.boxShadow = '';
-            });
-        }
-    }
+    animateElements();
 
-    // Активация режима глюка
-    function activateGlitchMode() {
-        if (!isGlitchModeActive) {
-            isGlitchModeActive = true;
-            glitchSound.play();
-            
-            // Создаем эффект глюка
-            const glitchInterval = setInterval(() => {
-                if (!isGlitchModeActive) {
-                    clearInterval(glitchInterval);
-                    return;
-                }
-                
-                // Случайное смещение элементов
-                content.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
-                
-                // Случайное изменение цветов
-                buttons.forEach(button => {
-                    button.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                });
-            }, 50);
-            
-            // Автоматическое отключение через 15 секунд
-            setTimeout(() => {
-                deactivateGlitchMode();
-            }, 15000);
-        }
-    }
+    // Секретный код
+    let konamiCode = [];
+    const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
-    // Деактивация режима глюка
-    function deactivateGlitchMode() {
-        if (isGlitchModeActive) {
-            isGlitchModeActive = false;
-            content.style.transform = 'none';
-            buttons.forEach(button => {
-                button.style.color = '';
-            });
-        }
-    }
+    // Счетчик кликов по аватарке
+    let avatarClickCount = 0;
+
+    // Флаги активных режимов
+    let isSecretModeActive = false;
+    let isGlitchModeActive = false;
 
     // Обработка кода Konami
     document.addEventListener('keydown', (e) => {
@@ -355,25 +313,90 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(noise);
     }
 
-    // Инициализация
-    updateDateTime();
-    setInterval(updateDateTime, 1000);
-    createScanline();
-    createCRTEffect();
-    createNoise();
-    systemBoot();
-
-    // Анимация появления элементов
-    function animateElements() {
-        const elements = document.querySelectorAll('.content > *');
-        elements.forEach((element, index) => {
+    // Активация секретного режима
+    function activateSecretMode() {
+        if (!isSecretModeActive) {
+            isSecretModeActive = true;
+            document.body.classList.add('secret-mode');
+            secretMessage.textContent = 'Секретный режим активирован!';
+            secretMessage.classList.add('show');
+            
+            // Изменяем стили для всех элементов
+            content.style.filter = 'hue-rotate(180deg)';
+            buttons.forEach(button => {
+                button.style.borderColor = '#ff00ff';
+                button.style.boxShadow = '0 0 20px #ff00ff';
+            });
+            
+            // Добавляем эффект мерцания
+            const flickerInterval = setInterval(() => {
+                if (!isSecretModeActive) {
+                    clearInterval(flickerInterval);
+                    return;
+                }
+                content.style.opacity = Math.random() * 0.2 + 0.8;
+            }, 100);
+            
+            // Автоматическое отключение через 30 секунд
             setTimeout(() => {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }, index * 200);
-        });
+                deactivateSecretMode();
+            }, 30000);
+        }
     }
 
-    animateElements();
+    // Деактивация секретного режима
+    function deactivateSecretMode() {
+        if (isSecretModeActive) {
+            isSecretModeActive = false;
+            document.body.classList.remove('secret-mode');
+            secretMessage.classList.remove('show');
+            content.style.filter = 'none';
+            content.style.opacity = '1';
+            buttons.forEach(button => {
+                button.style.borderColor = '';
+                button.style.boxShadow = '';
+            });
+        }
+    }
+
+    // Активация режима глюка
+    function activateGlitchMode() {
+        if (!isGlitchModeActive) {
+            isGlitchModeActive = true;
+            glitchSound.play();
+            
+            // Создаем эффект глюка
+            const glitchInterval = setInterval(() => {
+                if (!isGlitchModeActive) {
+                    clearInterval(glitchInterval);
+                    return;
+                }
+                
+                // Случайное смещение элементов
+                content.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
+                
+                // Случайное изменение цветов
+                buttons.forEach(button => {
+                    button.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                });
+            }, 50);
+            
+            // Автоматическое отключение через 15 секунд
+            setTimeout(() => {
+                deactivateGlitchMode();
+            }, 15000);
+        }
+    }
+
+    // Деактивация режима глюка
+    function deactivateGlitchMode() {
+        if (isGlitchModeActive) {
+            isGlitchModeActive = false;
+            content.style.transform = 'none';
+            buttons.forEach(button => {
+                button.style.color = '';
+            });
+        }
+    }
 });
 
