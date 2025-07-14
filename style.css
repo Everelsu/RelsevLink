@@ -1,3 +1,103 @@
+/* --- Dropdown styles --- */
+
+
+.dropdown {
+  position: static;
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+
+.dropbtn {
+  width: 100%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  text-align: left;
+  padding: 1rem 2rem;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 2;
+  box-shadow: none;
+}
+
+
+
+.dropdown-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  width: 100%;
+  background: rgba(0,0,0,0.95);
+  border: none;
+  box-shadow: 0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color);
+  padding: 0.5rem 0;
+  z-index: 1;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s cubic-bezier(.4,0,.2,1);
+}
+.dropdown-inner.show {
+  max-height: 500px;
+  opacity: 1;
+  pointer-events: auto;
+  transition: max-height 0.45s cubic-bezier(.4,0,.2,1), opacity 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.dropdown-inner .btn {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.dropdown-inner.show .btn {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+
+.dropdown-inner .btn {
+  border: 2px solid var(--accent-color);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-color);
+  width: 100%;
+  margin: 0;
+  box-shadow: 0 0 10px var(--shadow-color), inset 0 0 10px var(--shadow-color);
+  text-align: left;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  transition: all 0.3s;
+}
+.dropdown-inner .btn:hover {
+  background: var(--accent-color);
+  color: var(--primary-color);
+  box-shadow: 0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color);
+}
+
+@keyframes dropdown-fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chevron {
+  display: inline-block;
+  margin-left: 10px;
+  border: solid var(--accent-color);
+  border-width: 0 3px 3px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  transition: transform 0.2s;
+}
+.chevron.open {
+  transform: rotate(-135deg);
+}
 @import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
 
 :root {
@@ -225,7 +325,10 @@ body::before {
   padding: 1rem 2rem;
   border: 2px solid var(--accent-color);
   text-decoration: none;
-  text-align: center;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -369,7 +472,10 @@ body::before {
   position: relative;
   width: 100%;
   background: #000;
-  border: 20px solid var(--border-color);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   border-radius: 10px;
   box-shadow: 
     inset 0 0 20px var(--shadow-color),

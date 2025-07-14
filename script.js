@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Гарантированно играем oldpcbutton.mp3 на .control-knob и .power-button ---
+    // (даже если они не имеют .btn)
+    const powerBtnEl = document.querySelector('.power-button');
+    const controlKnobEls = document.querySelectorAll('.control-knob');
+    if (powerBtnEl) {
+        powerBtnEl.addEventListener('click', () => {
+            glitchSound.currentTime = 0;
+            glitchSound.play();
+        });
+    }
+    if (controlKnobEls) {
+        controlKnobEls.forEach(knob => {
+            knob.addEventListener('click', () => {
+                glitchSound.currentTime = 0;
+                glitchSound.play();
+            });
+        });
+    }
     const avatar = document.getElementById('avatar');
     const title = document.getElementById('title');
     const buttons = document.querySelectorAll('.btn');
@@ -11,11 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const copiedMessage = document.querySelector('.copied-message');
     const secretMessage = document.querySelector('.secret-message');
 
-    // Создаем пустые аудио элементы для GitHub
-    const clickSound = new Audio();
-    const clickedSound = new Audio();
-    const startupSound = new Audio();
-    const glitchSound = new Audio();
+    // Подключаем реальные аудиофайлы (должны лежать в корне проекта)
+    const clickSound = new Audio('click.mp3');
+    const clickedSound = new Audio('clicked.mp3');
+    const startupSound = new Audio('startup.mp3');
+    const glitchSound = new Audio('oldpcbutton.mp3');
     
     // Устанавливаем громкость
     clickSound.volume = 0.3;
@@ -23,27 +41,53 @@ document.addEventListener('DOMContentLoaded', () => {
     startupSound.volume = 0.5;
     glitchSound.volume = 0.4;
 
-    // Обработчики кнопок
+    // --- Sound unlock for browsers ---
+    let audioUnlocked = false;
+    function unlockAudio() {
+        if (!audioUnlocked) {
+            [clickSound, clickedSound, startupSound, glitchSound].forEach(sound => {
+                sound.volume = sound.volume; // Touch audio context
+            });
+            clickSound.play().catch(()=>{});
+            clickSound.pause();
+            clickSound.currentTime = 0;
+            audioUnlocked = true;
+        }
+    }
+    document.body.addEventListener('pointerdown', unlockAudio, { once: true });
+
+    // Обработчики кнопок (универсально для всех .btn)
     buttons.forEach(button => {
-        // Обработка наведения
+        // Наведение: звук + стиль
         button.addEventListener('mouseenter', () => {
+            clickSound.currentTime = 0;
+            clickSound.play();
             button.style.transform = 'translateX(10px)';
             button.style.background = 'var(--accent-color)';
             button.style.color = 'var(--primary-color)';
             button.style.boxShadow = '0 0 20px var(--shadow-color), inset 0 0 20px var(--shadow-color)';
         });
-
-        // Обработка ухода курсора
+        // Уход курсора: сброс стиля
         button.addEventListener('mouseleave', () => {
             button.style.transform = 'translateX(0)';
             button.style.background = 'transparent';
             button.style.color = 'var(--text-color)';
             button.style.boxShadow = '0 0 10px var(--shadow-color), inset 0 0 10px var(--shadow-color)';
         });
-
-        // Обработка клика
+        // Клик: для powerButton и controlKnobs — oldpcbutton.mp3, для остальных — clickedSound
         button.addEventListener('click', (e) => {
-            if (button.href.startsWith('mailto:')) {
+            if (
+                (powerButton && button === powerButton) ||
+                (button.classList.contains('control-knob'))
+            ) {
+                glitchSound.currentTime = 0;
+                glitchSound.play();
+            } else {
+                clickedSound.currentTime = 0;
+                clickedSound.play();
+            }
+            // Почта — копировать
+            if (button.href && button.href.startsWith('mailto:')) {
                 e.preventDefault();
                 const email = button.href.replace('mailto:', '');
                 navigator.clipboard.writeText(email).then(() => {
@@ -55,6 +99,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             }
+            // Для обычных ссылок больше ничего не делаем — пусть браузер сам решает (ctrl/cmd/колёсико)
+        });
+    });
+
+    // (удалено дублирование блока dropdowns)
+
+    // --- Dropdown logic + sound ---
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        const dropbtn = dropdown.querySelector('.dropbtn');
+        const dropdownInner = dropdown.querySelector('.dropdown-inner');
+        const chevron = dropbtn ? dropbtn.querySelector('.chevron') : null;
+        if (dropbtn && dropdownInner) {
+            dropbtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Звук открытия/закрытия
+                clickSound.currentTime = 0;
+                clickSound.play();
+                // Закрыть все другие дропдауны
+                document.querySelectorAll('.dropdown-inner').forEach(inner => {
+                    if (inner !== dropdownInner) inner.classList.remove('show');
+                });
+                // Переключить текущий
+                dropdownInner.classList.toggle('show');
+                if (chevron) chevron.classList.toggle('open');
+            });
+        }
+    });
+    // Закрытие дропдауна при клике вне
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.dropdown-inner').forEach(inner => {
+            inner.classList.remove('show');
+        });
+        document.querySelectorAll('.chevron.open').forEach(chevron => {
+            chevron.classList.remove('open');
         });
     });
 
@@ -261,30 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     avatar.addEventListener('mouseleave', () => {
         avatar.style.filter = 'grayscale(100%) contrast(120%) brightness(0.9)';
-    });
-
-    // Эффект при наведении на кнопки
-    buttons.forEach(button => {
-        button.addEventListener('mouseenter', () => {
-            clickSound.currentTime = 0;
-            clickSound.play();
-        });
-
-        button.addEventListener('click', (e) => {
-            clickedSound.currentTime = 0;
-            clickedSound.play();
-
-            if (button.href.startsWith('mailto:')) {
-                e.preventDefault();
-                const email = button.href.replace('mailto:', '');
-                navigator.clipboard.writeText(email).then(() => {
-                    copiedMessage.classList.add('show');
-                    setTimeout(() => {
-                        copiedMessage.classList.remove('show');
-                    }, 2000);
-                });
-            }
-        });
     });
 
     // Функция создания эффекта мерцания CRT
