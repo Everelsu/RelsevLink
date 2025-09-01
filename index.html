@@ -6,47 +6,157 @@
     <title>Relsev - ссылки</title>
     <link rel="shortcut icon" href="avatar.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <script src="script.js" defer></script>   
 </head>
 
 <body>
-    <div class="container">
-        <div class="content">
-            <div class="system-header">
-                <span class="system-text">Re OS v1.2</span>
-                <span class="date-text"></span>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-controls">
+                <button class="terminal-btn close-btn" title="Close">×</button>
+                <button class="terminal-btn minimize-btn" title="Minimize">−</button>
+                <button class="terminal-btn maximize-btn" title="Maximize">□</button>
             </div>
-            <div class="command-line">
-                <span class="prompt">C:\></span>
-                <span class="command"></span>
-                <span class="cursor">_</span>
+            <div class="terminal-title">guest@relsev:~$</div>
+            <div class="terminal-menu">
+                <button class="menu-btn" title="Menu">≡</button>
             </div>
-            <img src="avatar.png" alt="Avatar" class="avatar" id="avatar">
-            <h1 class="animated-text" data-text="Relsev">Relsev</h1>
-            <div class="buttons">
-                <a href="//steamcommunity.com/id/Relsev/" class="btn">> Steam</a>
-                <a href="//www.youtube.com/@Re1s3v" class="btn">> YouTube</a>
-                <a href="//www.tiktok.com/@everelsu" class="btn">> TikTok</a>
-                <div class="dropdown dropdown-inline">
-                    <button class="btn dropbtn dropdown-toggle" type="button">> Telegram <span class="chevron"></span></button>
-                    <div class="dropdown-inner">
-                        <a href="//t.me/re1sev" class="btn">> Telegram profile</a>
-                        <a href="//t.me/steamSaler" class="btn">> Telegram Channel(Сommercial)</a>
-                        <a href="//t.me/relsev" class="btn">> Telegram Channel(Personal)</a>
+        </div>
+        
+        <div class="terminal-content">
+            <div class="output-section" id="output">
+                <div class="ascii-art" id="ascii-art">
+                    <img src="avatar.png" alt="Avatar" class="avatar-image">
+                    <div class="ascii-container">
+                        <div class="ascii-controls">
+                            <button class="ascii-btn" id="ascii-prev" title="Previous ASCII art">◀</button>
+                            <span class="ascii-counter" id="ascii-counter">1/5</span>
+                            <button class="ascii-btn" id="ascii-next" title="Next ASCII art">▶</button>
+                        </div>
+                        <div class="ascii-text" title="Click to cycle through different ASCII art styles"></div>
                     </div>
                 </div>
-                <a href="//discord.com/users/490411567620423680" class="btn">> Discord</a>
-                <a href="mailto:egor.dagbaev@bk.ru" class="btn">> egor.dagbaev@bk.ru</a>
+                <div class="info-block">
+                    <div class="info-line">User: Relsev</div>
+                    <div class="info-line">Role: Digital Creator & Developer</div>
+                    <div class="info-line">Status: <span class="status-online">● online</span></div>
+                    <div class="info-line">Location: Russia</div>
+                </div>
+                
+                <div class="commands-help">
+                    <div class="help-title">Available commands:</div>
+                    <div class="command-item" data-cmd="steam">
+                        <span class="cmd-name">steam</span>
+                        <span class="cmd-desc"> - open gaming profile</span>
+                    </div>
+                    <div class="command-item" data-cmd="youtube">
+                        <span class="cmd-name">youtube</span>
+                        <span class="cmd-desc"> - open video channel</span>
+                    </div>
+                    <div class="command-item" data-cmd="tiktok">
+                        <span class="cmd-name">tiktok</span>
+                        <span class="cmd-desc"> - open short videos</span>
+                    </div>
+                    <div class="command-item telegram-cmd" data-cmd="telegram">
+                        <span class="cmd-name">telegram</span>
+                        <span class="cmd-desc"> - show messenger options</span>
+                        <div class="sub-commands" style="display: none;">
+                            <div class="sub-command" data-url="//t.me/re1sev">
+                                <span class="sub-name">  └─ personal</span>
+                                <span class="sub-desc"> - personal chat</span>
+                            </div>
+                            <div class="sub-command" data-url="//t.me/steamSaler">
+                                <span class="sub-name">  └─ commercial</span>
+                                <span class="sub-desc"> - business channel</span>
+                            </div>
+                            <div class="sub-command" data-url="//t.me/relsev">
+                                <span class="sub-name">  └─ channel</span>
+                                <span class="sub-desc"> - personal channel</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="command-item" data-cmd="discord">
+                        <span class="cmd-name">discord</span>
+                        <span class="cmd-desc"> - open voice chat</span>
+                    </div>
+                    <div class="command-item" data-cmd="email">
+                        <span class="cmd-name">email</span>
+                        <span class="cmd-desc"> - copy contact email</span>
+                    </div>
+                    <div class="command-item" data-cmd="help">
+                        <span class="cmd-name">help</span>
+                        <span class="cmd-desc"> - show this help</span>
+                    </div>
+                    <div class="command-item" data-cmd="clear">
+                        <span class="cmd-name">clear</span>
+                        <span class="cmd-desc"> - clear terminal</span>
+                    </div>
+                </div>
+                
+
             </div>
-            <div class="screen-controls">
-                <div class="control-knob" data-control="brightness"></div>
-                <div class="control-knob" data-control="contrast"></div>
-                <div class="control-knob" data-control="color"></div>
+            
+            <div class="input-line">
+                <span class="prompt">guest@relsev:~$</span>
+                <input type="text" class="terminal-input" id="terminal-input" autofocus>
             </div>
-            <div class="power-button"></div>
         </div>
     </div>
+
+    <!-- Game Window -->
+    <div class="game-window" id="game-window" style="display: none;">
+        <div class="game-header">
+            <div class="game-controls">
+                <button class="game-btn close-game-btn" title="Close Game">×</button>
+                <button class="game-btn minimize-game-btn" title="Minimize Game">−</button>
+            </div>
+            <div class="game-title">Terminal Snake v1.0</div>
+        </div>
+        <div class="game-content">
+            <div class="game-info">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="high-score">High: <span id="high-score">0</span></div>
+            </div>
+            <canvas id="game-canvas" width="400" height="400"></canvas>
+            <div class="game-instructions">
+                <div class="instruction-line">Use WASD or Arrow Keys to move</div>
+                <div class="instruction-line">Eat food (●) to grow</div>
+                <div class="instruction-line">Don't hit walls or yourself!</div>
+                <div class="instruction-line">Press SPACE to pause/resume</div>
+                <div class="instruction-line">Press R to restart</div>
+            </div>
+            <div class="game-status" id="game-status">Press any key to start!</div>
+        </div>
+    </div>
+
+    <!-- Records Window -->
+    <div class="records-window" id="records-window" style="display: none;">
+        <div class="records-window-header">
+            <div class="records-window-controls">
+                <button class="records-window-btn close-records-window-btn" title="Close Records">×</button>
+                <button class="records-window-btn minimize-records-window-btn" title="Minimize Records">−</button>
+            </div>
+            <div class="records-window-title">🏆 Gaming Records</div>
+        </div>
+        <div class="records-window-content">
+            <table class="records-table" id="records-window-table">
+                <thead>
+                    <tr>
+                        <th>Game</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="records-window-tbody">
+                    <tr>
+                        <td colspan="3" class="no-records">No records yet!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="copied-message">Скопировано!</div>
     <div class="secret-message"></div>
     <audio id="clickSound" src="click.mp3"></audio>
@@ -54,3 +164,4 @@
     <audio id="startupSound" src="oldpcbutton.mp3"></audio>
 </body>
 </html>
+
