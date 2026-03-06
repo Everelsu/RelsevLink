@@ -1,167 +1,127 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relsev - ссылки</title>
-    <link rel="shortcut icon" href="avatar.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-    <script src="script.js" defer></script>   
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Relsev — Digital Creator · Dev. Links, contacts, content.">
+  <meta name="theme-color" content="#030305">
+  <title>relsev</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Share+Tech+Mono&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="styles.css">
 </head>
+<body data-entered="false">
 
-<body>
-    <div class="terminal-container">
-        <div class="terminal-header">
-            <div class="terminal-controls">
-                <button class="terminal-btn close-btn" title="Close">×</button>
-                <button class="terminal-btn minimize-btn" title="Minimize">−</button>
-                <button class="terminal-btn maximize-btn" title="Maximize">□</button>
-            </div>
-            <div class="terminal-title">guest@relsev:~$</div>
-            <div class="terminal-menu">
-                <button class="menu-btn" title="Menu">≡</button>
-            </div>
-        </div>
-        
-        <div class="terminal-content">
-            <div class="output-section" id="output">
-                <div class="ascii-art" id="ascii-art">
-                    <img src="avatar.png" alt="Avatar" class="avatar-image">
-                    <div class="ascii-container">
-                        <div class="ascii-controls">
-                            <button class="ascii-btn" id="ascii-prev" title="Previous ASCII art">◀</button>
-                            <span class="ascii-counter" id="ascii-counter">1/5</span>
-                            <button class="ascii-btn" id="ascii-next" title="Next ASCII art">▶</button>
-                        </div>
-                        <div class="ascii-text" title="Click to cycle through different ASCII art styles"></div>
-                    </div>
-                </div>
-                <div class="info-block">
-                    <div class="info-line">User: Relsev</div>
-                    <div class="info-line">Role: Digital Creator & Developer</div>
-                    <div class="info-line">Status: <span class="status-online">● online</span></div>
-                    <div class="info-line">Location: Russia</div>
-                </div>
-                
-                <div class="commands-help">
-                    <div class="help-title">Available commands:</div>
-                    <div class="command-item" data-cmd="steam">
-                        <span class="cmd-name">steam</span>
-                        <span class="cmd-desc"> - open gaming profile</span>
-                    </div>
-                    <div class="command-item" data-cmd="youtube">
-                        <span class="cmd-name">youtube</span>
-                        <span class="cmd-desc"> - open video channel</span>
-                    </div>
-                    <div class="command-item" data-cmd="tiktok">
-                        <span class="cmd-name">tiktok</span>
-                        <span class="cmd-desc"> - open short videos</span>
-                    </div>
-                    <div class="command-item telegram-cmd" data-cmd="telegram">
-                        <span class="cmd-name">telegram</span>
-                        <span class="cmd-desc"> - show messenger options</span>
-                        <div class="sub-commands" style="display: none;">
-                            <div class="sub-command" data-url="//t.me/re1sev">
-                                <span class="sub-name">  └─ personal</span>
-                                <span class="sub-desc"> - personal chat</span>
-                            </div>
-                            <div class="sub-command" data-url="//t.me/steamSaler">
-                                <span class="sub-name">  └─ commercial</span>
-                                <span class="sub-desc"> - business channel</span>
-                            </div>
-                            <div class="sub-command" data-url="//t.me/relsev">
-                                <span class="sub-name">  └─ channel</span>
-                                <span class="sub-desc"> - personal channel</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="command-item" data-cmd="discord">
-                        <span class="cmd-name">discord</span>
-                        <span class="cmd-desc"> - open voice chat</span>
-                    </div>
-                    <div class="command-item" data-cmd="email">
-                        <span class="cmd-name">email</span>
-                        <span class="cmd-desc"> - copy contact email</span>
-                    </div>
-                    <div class="command-item" data-cmd="help">
-                        <span class="cmd-name">help</span>
-                        <span class="cmd-desc"> - show this help</span>
-                    </div>
-                    <div class="command-item" data-cmd="clear">
-                        <span class="cmd-name">clear</span>
-                        <span class="cmd-desc"> - clear terminal</span>
-                    </div>
-                </div>
-                
+  <div id="cur">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="filter: drop-shadow(0 0 3px rgba(0,0,0,.9))">
+      <path d="M2 2L15 9L9 10.3L7 16L2 2Z" fill="white" stroke="rgba(0,0,0,.5)" stroke-width=".6"/>
+    </svg>
+  </div>
 
-            </div>
-            
-            <div class="input-line">
-                <span class="prompt">guest@relsev:~$</span>
-                <input type="text" class="terminal-input" id="terminal-input" autofocus>
-            </div>
-        </div>
+  <button type="button" id="enter" onclick="enterSite()" aria-label="Enter site">
+    <span class="e-scan" aria-hidden="true"></span>
+    <span class="e-cross" aria-hidden="true">✝ ✝ ✝</span>
+    <span class="e-title">Relsev</span>
+    <span class="e-hint">[ click to enter ]</span>
+  </button>
+
+  <canvas id="bgc" aria-hidden="true"></canvas>
+  <canvas id="veinsC" aria-hidden="true"></canvas>
+  <canvas id="noiseC" aria-hidden="true"></canvas>
+  <div class="vignette"></div>
+  <div class="scan-lines"></div>
+  <div class="gband" style="animation-duration: 9s"></div>
+  <div class="gband" style="animation-duration: 14s; animation-delay: -6s; height: 3px; opacity: .3"></div>
+
+  <div id="audio-ctrl" role="group" aria-label="Audio">
+    <button type="button" class="ac-btn" id="btnAmb" title="Toggle ambient sound" aria-pressed="true" onclick="toggleAmb()"><i class="fa-solid fa-music" aria-hidden="true"></i></button>
+    <button type="button" class="ac-btn" id="btnSfx" title="Toggle link sounds" aria-pressed="true" onclick="toggleSfx()"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></button>
+  </div>
+  <div id="toast" role="status" aria-live="polite" data-default="email copied">email copied</div>
+
+  <div class="page">
+    <div class="hero">
+      <svg class="halo-svg" viewBox="0 0 200 85" fill="none">
+        <ellipse cx="100" cy="13" rx="30" ry="7" stroke="var(--ac)" stroke-width="1" fill="none" stroke-dasharray="5 4" opacity=".45"/>
+        <path d="M100 52C80 40 48 16 16 28C4 33-3 46 8 55C25 67 68 58 98 54" fill="rgba(122,90,248,.05)" stroke="rgba(122,90,248,.18)" stroke-width=".8"/>
+        <path d="M100 52C82 38 52 12 20 22" stroke="rgba(200,185,255,.11)" stroke-width=".7" fill="none"/>
+        <path d="M100 52C84 44 58 24 30 32" stroke="rgba(200,185,255,.09)" stroke-width=".7" fill="none"/>
+        <path d="M100 52C88 50 68 46 44 52" stroke="rgba(200,185,255,.08)" stroke-width=".7" fill="none"/>
+        <path d="M100 52C120 40 152 16 184 28C196 33 203 46 192 55C175 67 132 58 102 54" fill="rgba(122,90,248,.05)" stroke="rgba(122,90,248,.18)" stroke-width=".8"/>
+        <path d="M100 52C118 38 148 12 180 22" stroke="rgba(200,185,255,.11)" stroke-width=".7" fill="none"/>
+        <path d="M100 52C116 44 142 24 170 32" stroke="rgba(200,185,255,.09)" stroke-width=".7" fill="none"/>
+        <path d="M100 52C112 50 132 46 156 52" stroke="rgba(200,185,255,.08)" stroke-width=".7" fill="none"/>
+      </svg>
+      <div class="av-outer">
+        <img id="avi" src="avatar.png" alt="avatar" crossorigin="anonymous"
+             onerror="this.style.display='none'; document.getElementById('avf').style.display='flex';">
+        <div id="avf">R</div>
+        <div class="av-glow"></div>
+      </div>
+      <div class="hero-name" id="heroName" data-secret="">Relsev</div>
+      <div class="hero-role">What · You need to be alive</div>
     </div>
 
-    <!-- Game Window -->
-    <div class="game-window" id="game-window" style="display: none;">
-        <div class="game-header">
-            <div class="game-controls">
-                <button class="game-btn close-game-btn" title="Close Game">×</button>
-                <button class="game-btn minimize-game-btn" title="Minimize Game">−</button>
-            </div>
-            <div class="game-title">Terminal Snake v1.0</div>
-        </div>
-        <div class="game-content">
-            <div class="game-info">
-                <div class="score">Score: <span id="score">0</span></div>
-                <div class="high-score">High: <span id="high-score">0</span></div>
-            </div>
-            <canvas id="game-canvas" width="400" height="400"></canvas>
-            <div class="game-instructions">
-                <div class="instruction-line">Use WASD or Arrow Keys to move</div>
-                <div class="instruction-line">Eat food (●) to grow</div>
-                <div class="instruction-line">Don't hit walls or yourself!</div>
-                <div class="instruction-line">Press SPACE to pause/resume</div>
-                <div class="instruction-line">Press R to restart</div>
-            </div>
-            <div class="game-status" id="game-status">Press any key to start!</div>
-        </div>
+    <div class="odiv"><span>✦ ✦ ✦</span></div>
+    <div class="quote"><p>i keep building things<br>in a world that keeps<br>falling apart.</p></div>
+
+    <div class="lgroup" style="--d: .8s">
+      <div class="slabel">reach me</div>
+      <a href="https://t.me/Re1sev" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
+        <span class="lico"><i class="fa-brands fa-telegram"></i></span><span class="lnm">telegram profile</span><span class="larr">enter →</span>
+      </a>
+      <a href="https://t.me/relsev" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
+        <span class="lico"><i class="fa-brands fa-telegram"></i></span><span class="lnm">telegram channel</span><span class="larr">enter →</span>
+      </a>
+      <a href="https://discord.com/users/490411567620423680" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="3">
+        <span class="lico"><i class="fa-brands fa-discord"></i></span><span class="lnm">discord</span><span class="larr">enter →</span>
+      </a>
+      <a href="#" class="lnk" onclick="copyEmail(event); return false;" data-snd="4" aria-label="Copy email address">
+        <span class="lico"><i class="fa-regular fa-envelope" aria-hidden="true"></i></span><span class="lnm">email</span>
+        <span class="larr" id="earr">copy ✦</span>
+      </a>
     </div>
 
-    <!-- Records Window -->
-    <div class="records-window" id="records-window" style="display: none;">
-        <div class="records-window-header">
-            <div class="records-window-controls">
-                <button class="records-window-btn close-records-window-btn" title="Close Records">×</button>
-                <button class="records-window-btn minimize-records-window-btn" title="Minimize Records">−</button>
-            </div>
-            <div class="records-window-title">🏆 Gaming Records</div>
-        </div>
-        <div class="records-window-content">
-            <table class="records-table" id="records-window-table">
-                <thead>
-                    <tr>
-                        <th>Game</th>
-                        <th>Score</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody id="records-window-tbody">
-                    <tr>
-                        <td colspan="3" class="no-records">No records yet!</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="lgroup" style="--d: 1s">
+      <div class="slabel">content</div>
+      <a href="https://www.youtube.com/@Re1s3v" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
+        <span class="lico"><i class="fa-brands fa-youtube"></i></span><span class="lnm">youtube</span><span class="larr">watch →</span>
+      </a>
+      <a href="https://www.tiktok.com/@everelsu" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="2">
+        <span class="lico"><i class="fa-brands fa-tiktok"></i></span><span class="lnm">tiktok</span><span class="larr">watch →</span>
+      </a>
+      <a href="https://github.com/Everelsu" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
+        <span class="lico"><i class="fa-brands fa-github"></i></span><span class="lnm">github</span><span class="larr">code →</span>
+      </a>
+      <a href="https://x.com/Rels3v" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="2">
+        <span class="lico"><i class="fa-brands fa-x-twitter"></i></span><span class="lnm">X</span><span class="larr">follow →</span>
+      </a>
     </div>
 
-    <div class="copied-message">Скопировано!</div>
-    <div class="secret-message"></div>
-    <audio id="clickSound" src="click.mp3"></audio>
-    <audio id="clickedSound" src="clicked.mp3"></audio>
-    <audio id="startupSound" src="oldpcbutton.mp3"></audio>
+    <div class="lgroup" style="--d: 1.1s">
+      <div class="slabel">gaming</div>
+      <a href="https://steamcommunity.com/id/Relsev/" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="3">
+        <span class="lico"><i class="fa-brands fa-steam"></i></span><span class="lnm">steam</span><span class="larr">play →</span>
+      </a>
+    </div>
+
+    <section class="err-section" aria-label="System log">
+      <div class="slabel">system.log</div>
+      <button type="button" class="epill" id="mainErr" onclick="nextErr(this)">
+        <span class="ep-ico" aria-hidden="true">⚠</span>
+        <span class="ep-txt" id="errtxt">heart.exe has stopped working</span>
+        <span class="ep-ok">OK</span>
+      </button>
+    </section>
+
+    <footer>
+      <div class="fsym">✝ ✝ ✝</div>
+      <div class="ftxt"><span class="ftxt-name" title="...">relsev</span> · <span id="yr"></span></div>
+      <div id="secret-msg" class="secret-msg" aria-live="polite" hidden></div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/gh/jwagner/simplex-noise.js@master/simplex-noise.min.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
-
