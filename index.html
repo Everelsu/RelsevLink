@@ -2,126 +2,230 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Relsev - What do you even want?">
-  <meta name="theme-color" content="#030305">
-  <title>Relsev</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Share+Tech+Mono&display=swap">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Relsev — where the dark is only unlit.">
+  <meta name="theme-color" content="#050506">
+  <title>Relsev - Et te ipsum in malam rem abire potes si hoc interpretatus es.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Share+Tech+Mono&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body data-entered="false">
+<body data-entered="false" data-loaded="false" data-view="home">
 
-  <div id="cur">
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="filter: drop-shadow(0 0 3px rgba(0,0,0,.9))">
-      <path d="M2 2L15 9L9 10.3L7 16L2 2Z" fill="white" stroke="rgba(0,0,0,.5)" stroke-width=".6"/>
-    </svg>
+  <!-- ═══════════ preloader ═══════════ -->
+  <div id="loader">
+    <div class="ld-inner">
+      <span class="ld-txt" data-i18n="loading">now loading</span>
+      <span class="ld-bar"><i id="ldFill"></i></span>
+      <span class="ld-pct" id="ldPct">0<em>%</em></span>
+    </div>
   </div>
 
-  <button type="button" id="enter" onclick="enterSite()" aria-label="Enter site">
-    <span class="e-scan" aria-hidden="true"></span>
-    <span class="e-cross" aria-hidden="true">✝ ✝ ✝</span>
-    <span class="e-title">Relsev</span>
-    <span class="e-hint">[ click to enter ]</span>
+  <!-- ═══════════ the seal ═══════════ -->
+  <button type="button" id="seal" data-i18n-label="sealAria" aria-label="Break the seal and enter">
+    <span class="s-sheen" aria-hidden="true"></span>
+    <svg class="s-ring" viewBox="0 0 200 200" aria-hidden="true">
+      <circle class="sr-a" cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width=".7" opacity=".45"/>
+      <circle class="sr-b" cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-width=".5" stroke-dasharray="1.5 5" opacity=".5"/>
+      <circle class="sr-c" cx="100" cy="100" r="62" fill="none" stroke="currentColor" stroke-width=".4" opacity=".3"/>
+      <path d="M100 30 L100 170 M30 100 L170 100" stroke="currentColor" stroke-width=".35" opacity=".18"/>
+      <path class="sr-star" d="M100 48 L107 90 L149 100 L107 110 L100 152 L93 110 L51 100 L93 90 Z" fill="currentColor" opacity=".55"/>
+      <path class="sr-star2" d="M100 66 L104 96 L134 100 L104 104 L100 134 L96 104 L66 100 L96 96 Z" fill="currentColor" opacity=".28"/>
+    </svg>
+    <span class="s-pre">✦ anno mmxxvi ✦</span>
+    <span class="s-title">Relsev</span>
+    <span class="s-hint" data-i18n="sealHint">[ break the what? ]</span>
   </button>
 
-  <canvas id="bgc" aria-hidden="true"></canvas>
-  <canvas id="veinsC" aria-hidden="true"></canvas>
-  <canvas id="noiseC" aria-hidden="true"></canvas>
-  <div class="vignette"></div>
-  <div class="scan-lines"></div>
-  <div class="gband" style="animation-duration: 9s"></div>
-  <div class="gband" style="animation-duration: 14s; animation-delay: -6s; height: 3px; opacity: .3"></div>
-
-  <div id="audio-ctrl" role="group" aria-label="Audio">
-    <button type="button" class="ac-btn" id="btnAmb" title="Toggle ambient sound" aria-pressed="true" onclick="toggleAmb()"><i class="fa-solid fa-music" aria-hidden="true"></i></button>
-    <button type="button" class="ac-btn" id="btnSfx" title="Toggle link sounds" aria-pressed="true" onclick="toggleSfx()"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></button>
+  <!-- ═══════════ the standing scene ═══════════ -->
+  <div id="scene" aria-hidden="true">
+    <div class="sc" id="sc">
+      <img class="lyr lyr-far"  data-depth="6"  src="avatar.webp" alt="" decoding="async">
+      <img class="lyr lyr-glow" data-depth="14" src="avatar.webp" alt="" decoding="async">
+      <img class="lyr lyr-mid"  data-depth="24" src="avatar.webp" alt="" decoding="async">
+      <div class="lyr lyr-scrim" data-depth="8"></div>
+      <div class="lyr lyr-shaft" data-depth="34"></div>
+      <canvas id="embers" data-depth="46"></canvas>
+      <div class="lyr lyr-fog" data-depth="10"></div>
+    </div>
   </div>
-  <div id="toast" role="status" aria-live="polite" data-default="email copied">email copied</div>
 
-  <div class="page">
-    <div class="hero">
-      <svg class="halo-svg" viewBox="0 0 200 85" fill="none">
-        <ellipse cx="100" cy="13" rx="30" ry="7" stroke="var(--ac)" stroke-width="1" fill="none" stroke-dasharray="5 4" opacity=".45"/>
-        <path d="M100 52C80 40 48 16 16 28C4 33-3 46 8 55C25 67 68 58 98 54" fill="rgba(122,90,248,.05)" stroke="rgba(122,90,248,.18)" stroke-width=".8"/>
-        <path d="M100 52C82 38 52 12 20 22" stroke="rgba(200,185,255,.11)" stroke-width=".7" fill="none"/>
-        <path d="M100 52C84 44 58 24 30 32" stroke="rgba(200,185,255,.09)" stroke-width=".7" fill="none"/>
-        <path d="M100 52C88 50 68 46 44 52" stroke="rgba(200,185,255,.08)" stroke-width=".7" fill="none"/>
-        <path d="M100 52C120 40 152 16 184 28C196 33 203 46 192 55C175 67 132 58 102 54" fill="rgba(122,90,248,.05)" stroke="rgba(122,90,248,.18)" stroke-width=".8"/>
-        <path d="M100 52C118 38 148 12 180 22" stroke="rgba(200,185,255,.11)" stroke-width=".7" fill="none"/>
-        <path d="M100 52C116 44 142 24 170 32" stroke="rgba(200,185,255,.09)" stroke-width=".7" fill="none"/>
-        <path d="M100 52C112 50 132 46 156 52" stroke="rgba(200,185,255,.08)" stroke-width=".7" fill="none"/>
-      </svg>
-      <div class="av-outer">
-        <img id="avi" src="avatar.png" alt="avatar" crossorigin="anonymous"
-             onerror="this.style.display='none'; document.getElementById('avf').style.display='flex';">
-        <div id="avf">R</div>
-        <div class="av-glow"></div>
-      </div>
-      <div class="hero-name" id="heroName" data-secret="">Relsev</div>
-      <div class="hero-role">What · You need to be alive</div>
-    </div>
+  <!-- ═══════════ atmosphere ═══════════ -->
+  <canvas id="dust" aria-hidden="true"></canvas>
+  <div id="lamp" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-    <div class="odiv"><span>✦ ✦ ✦</span></div>
-    <div class="quote"><p>i keep building things<br>in a world that keeps<br>falling apart.</p></div>
+  <!-- ═══════════ the silver frame ═══════════ -->
+  <div id="ornament" aria-hidden="true">
+    <span class="edge edge-t"></span><span class="edge edge-b"></span>
+    <span class="edge edge-l"></span><span class="edge edge-r"></span>
+    <svg class="cnr cnr-tl" viewBox="0 0 120 120"><use href="#filigree"/></svg>
+    <svg class="cnr cnr-tr" viewBox="0 0 120 120"><use href="#filigree"/></svg>
+    <svg class="cnr cnr-bl" viewBox="0 0 120 120"><use href="#filigree"/></svg>
+    <svg class="cnr cnr-br" viewBox="0 0 120 120"><use href="#filigree"/></svg>
+    <span class="ecross ec-t">✜</span>
+  </div>
+  <button type="button" class="ecross ec-b" id="hiddenDoor" aria-label="?" title="">✜</button>
 
-    <div class="lgroup" style="--d: .8s">
-      <div class="slabel">reach me</div>
-      <a href="https://t.me/Re1sev" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
-        <span class="lico"><i class="fa-brands fa-telegram"></i></span><span class="lnm">telegram profile</span><span class="larr">enter →</span>
-      </a>
-      <a href="https://t.me/relsev" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
-        <span class="lico"><i class="fa-brands fa-telegram"></i></span><span class="lnm">telegram channel</span><span class="larr">enter →</span>
-      </a>
-      <a href="https://discord.com/users/490411567620423680" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="3">
-        <span class="lico"><i class="fa-brands fa-discord"></i></span><span class="lnm">discord</span><span class="larr">enter →</span>
-      </a>
-      <a href="#" class="lnk" onclick="copyEmail(event); return false;" data-snd="4" aria-label="Copy email address">
-        <span class="lico"><i class="fa-regular fa-envelope" aria-hidden="true"></i></span><span class="lnm">email</span>
-        <span class="larr" id="earr">copy ✦</span>
-      </a>
-    </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="filigree" fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M3 119 L3 22 Q3 3 22 3 L119 3" stroke-width="1.1"/>
+        <path d="M11 119 L11 28 Q11 11 28 11 L119 11" stroke-width=".5" opacity=".55"/>
+        <path d="M28 11 C 47 11, 60 23, 60 38 C 60 51, 49 58, 40 53 C 32 49, 33 38, 42 37" stroke-width=".75" opacity=".8"/>
+        <path d="M11 28 C 11 47, 23 60, 38 60 C 51 60, 58 49, 53 40 C 49 32, 38 33, 37 42" stroke-width=".75" opacity=".8"/>
+        <path d="M60 38 q10 -9 24 -8 M38 60 q-9 10 -8 24" stroke-width=".5" opacity=".5"/>
+        <circle cx="22" cy="22" r="2.2" stroke-width=".6" opacity=".7"/>
+        <path d="M22 14 v16 M14 22 h16" stroke-width=".45" opacity=".45"/>
+        <circle cx="72" cy="26" r="1.1" fill="currentColor" stroke="none" opacity=".6"/>
+        <circle cx="26" cy="72" r="1.1" fill="currentColor" stroke="none" opacity=".6"/>
+      </g>
+    </defs>
+  </svg>
 
-    <div class="lgroup" style="--d: 1s">
-      <div class="slabel">content</div>
-      <a href="https://www.youtube.com/@Re1s3v" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
-        <span class="lico"><i class="fa-brands fa-youtube"></i></span><span class="lnm">youtube</span><span class="larr">watch →</span>
-      </a>
-      <a href="https://www.tiktok.com/@everelsu" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="2">
-        <span class="lico"><i class="fa-brands fa-tiktok"></i></span><span class="lnm">tiktok</span><span class="larr">watch →</span>
-      </a>
-      <a href="https://github.com/Everelsu" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="0">
-        <span class="lico"><i class="fa-brands fa-github"></i></span><span class="lnm">github</span><span class="larr">code →</span>
-      </a>
-      <a href="https://x.com/Rels3v" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="2">
-        <span class="lico"><i class="fa-brands fa-x-twitter"></i></span><span class="lnm">X</span><span class="larr">follow →</span>
-      </a>
-    </div>
+  <!-- ═══════════ chrome ═══════════ -->
+  <header id="chrome">
+    <button type="button" class="brand" data-go="home" data-i18n-label="brandAria" aria-label="Relsev — home">
+      <span class="brand-mark">R</span><span class="brand-name">elsev</span>
+    </button>
 
-    <div class="lgroup" style="--d: 1.1s">
-      <div class="slabel">gaming</div>
-      <a href="https://steamcommunity.com/id/Relsev/" target="_blank" rel="noopener noreferrer" class="lnk" data-snd="3">
-        <span class="lico"><i class="fa-brands fa-steam"></i></span><span class="lnm">steam</span><span class="larr">play →</span>
-      </a>
-    </div>
+    <nav class="tabs" id="tabs" data-i18n-label="navAria" aria-label="Sections">
+      <button type="button" data-go="home"><span data-i18n="navHome">home</span></button>
+      <button type="button" data-go="elsewhere"><span data-i18n="navElsewhere">elsewhere</span></button>
+      <button type="button" data-go="litany"><span data-i18n="navLitany">litany</span></button>
+      <button type="button" data-go="rosary" class="tab-secret" hidden><span data-i18n="navRosary">the rosary</span></button>
+    </nav>
 
-    <section class="err-section" aria-label="System log">
-      <div class="slabel">system.log</div>
-      <button type="button" class="epill" id="mainErr" onclick="nextErr(this)">
-        <span class="ep-ico" aria-hidden="true">⚠</span>
-        <span class="ep-txt" id="errtxt">heart.exe has stopped working</span>
-        <span class="ep-ok">OK</span>
+    <div class="chrome-right">
+      <button type="button" class="ac-btn" id="btnLang" data-i18n-title="langTitle" title="Language" aria-haspopup="true" aria-expanded="false">
+        <i class="fa-solid fa-globe" aria-hidden="true"></i>
       </button>
+      <div id="langMenu" role="menu" hidden></div>
+      <button type="button" class="ac-btn" id="btnAmb" data-i18n-title="ambTitle" title="Ambient drone" aria-pressed="false"><i class="fa-solid fa-music" aria-hidden="true"></i></button>
+      <button type="button" class="ac-btn" id="btnSfx" data-i18n-title="sfxTitle" title="Interface sounds" aria-pressed="true"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></button>
+      <button type="button" class="cta" id="btnLetters"><span data-i18n="letters">letters</span> <em>+</em></button>
+    </div>
+  </header>
+
+  <!-- ═══════════ the rail — where you stand ═══════════ -->
+  <aside id="rail" aria-hidden="true"><ol id="railList"></ol></aside>
+
+  <!-- ═══════════ views ═══════════ -->
+  <main id="views">
+
+    <!-- ─── home ─── -->
+    <section class="view" data-view="home" data-i18n-label="navHome" aria-label="Relsev">
+      <div class="lockup" id="lockup">
+        <div class="reliquary" data-depth="40">
+          <svg class="rq-arch" viewBox="0 0 300 300" fill="none" aria-hidden="true">
+            <path class="rq-l1" d="M26 78 L26 26 L78 26"   stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path class="rq-l1" d="M274 78 L274 26 L222 26" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path class="rq-l1" d="M26 222 L26 274 L78 274" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path class="rq-l1" d="M274 222 L274 274 L222 274" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path class="rq-l2" d="M33 70 L33 33 L70 33 M267 70 L267 33 L230 33 M33 230 L33 267 L70 267 M267 230 L267 267 L230 267"
+                  stroke="currentColor" stroke-width=".5" opacity=".55" stroke-linecap="round"/>
+            <path class="rq-l2" d="M78 26 C 96 26, 106 36, 104 48 C 102 58, 92 60, 88 54" stroke="currentColor" stroke-width=".7" opacity=".7" stroke-linecap="round"/>
+            <path class="rq-l2" d="M222 26 C 204 26, 194 36, 196 48 C 198 58, 208 60, 212 54" stroke="currentColor" stroke-width=".7" opacity=".7" stroke-linecap="round"/>
+            <path class="rq-l2" d="M78 274 C 96 274, 106 264, 104 252 C 102 242, 92 240, 88 246" stroke="currentColor" stroke-width=".7" opacity=".7" stroke-linecap="round"/>
+            <path class="rq-l2" d="M222 274 C 204 274, 194 264, 196 252 C 198 242, 208 240, 212 246" stroke="currentColor" stroke-width=".7" opacity=".7" stroke-linecap="round"/>
+            <path class="rq-l3" d="M150 6 L150 24 M141 13 L159 13" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            <path class="rq-l3" d="M150 24 L155 32 L150 40 L145 32 Z" fill="currentColor" opacity=".85"/>
+            <path class="rq-l3" d="M120 26 L180 26" stroke="currentColor" stroke-width=".4" stroke-dasharray="2 5" opacity=".5"/>
+            <path class="rq-l3" d="M150 260 L155 268 L150 276 L145 268 Z" fill="currentColor" opacity=".85"/>
+            <path class="rq-l3" d="M120 274 q30 16 60 0" stroke="currentColor" stroke-width=".6" opacity=".6"/>
+            <path class="rq-l3" d="M150 276 L150 292 M144 286 L156 286" stroke="currentColor" stroke-width=".8" stroke-linecap="round"/>
+            <path class="rq-l3" d="M26 138 L26 162 M274 138 L274 162" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>
+            <circle class="rq-l3" cx="26" cy="150" r="2.4" fill="currentColor" opacity=".7"/>
+            <circle class="rq-l3" cx="274" cy="150" r="2.4" fill="currentColor" opacity=".7"/>
+          </svg>
+
+          <div class="av-outer" id="avOuter">
+            <img class="av-base" id="avi" src="avatar.webp" data-i18n-alt="plateAlt" alt="Relsev — a winged figure rendered in silver" decoding="async">
+            <img class="av-lit" src="avatar.webp" alt="" aria-hidden="true" decoding="async">
+            <div class="av-fallback" id="avf">R</div>
+            <span class="av-sheen" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <h1 class="hero-name" id="heroName" data-depth="52">Relsev</h1>
+        <div class="epithet" data-depth="56">
+          <span data-i18n="epithet">where shadows whisper</span> <span>· in tenebris, ædifico</span>
+        </div>
+        <div class="status-line" data-depth="60">
+          <span class="sdot"></span><span data-i18n="status">present · somewhere east of midnight</span>
+        </div>
+        <button type="button" class="enter-link" data-go="elsewhere">
+          <span data-i18n="findMe">find me elsewhere</span><i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i>
+        </button>
+      </div>
     </section>
 
-    <footer>
-      <div class="fsym">✝ ✝ ✝</div>
-      <div class="ftxt"><span class="ftxt-name" title="...">relsev</span> · <span id="yr"></span></div>
-      <div id="secret-msg" class="secret-msg" aria-live="polite" hidden></div>
-    </footer>
-  </div>
+    <!-- ─── elsewhere ─── -->
+    <section class="view" data-view="elsewhere" data-i18n-label="navElsewhere" aria-label="Elsewhere">
+      <div class="sheet">
+        <div class="ch-head"><span class="ch-num">I</span><span class="ch-name" data-i18n="navElsewhere">elsewhere</span></div>
+        <p class="ch-sub" data-i18n="elsewhereSub">nine doors, plainly named.</p>
+        <nav class="plates" id="plates"></nav>
+      </div>
+    </section>
 
-  <script src="https://cdn.jsdelivr.net/gh/jwagner/simplex-noise.js@master/simplex-noise.min.js"></script>
+    <!-- ─── litany ─── -->
+    <section class="view" data-view="litany" data-i18n-label="navLitany" aria-label="Litany">
+      <div class="sheet">
+        <div class="ch-head"><span class="ch-num">II</span><span class="ch-name" data-i18n="navLitany">litany</span></div>
+        <p class="inscribed"><span class="dropcap" data-i18n="dropcap">I</span><span data-i18n="inscribed"> keep building things in a world that keeps
+        falling apart — small altars of light against a very large dark.</span></p>
+        <button type="button" class="epill" id="litany">
+          <span class="ep-ico" aria-hidden="true">✝</span>
+          <span class="ep-txt" id="litanyTxt">the dark is not empty. it is only unlit.</span>
+          <span class="ep-ok" data-i18n="amen">amen</span>
+        </button>
+        <div class="rule"><span>✦ ✦ ✦</span></div>
+        <div class="colophon">
+          <div class="col-sym">✝ ✦ ✝</div>
+          <div class="col-txt">
+            <span data-i18n="scribedBy">scribed by</span> <span class="ftxt-name" id="ftName" data-i18n-title="thrice" title="press thrice">relsev</span><br>
+            <span data-i18n="anno">anno</span> · <span id="yr"></span> · soli deo gloria
+          </div>
+          <div id="secret" class="secret" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── the rosary · found, not shown ─── -->
+    <section class="view" data-view="rosary" data-i18n-label="navRosary" aria-label="The rosary">
+      <div class="sheet">
+        <div class="ch-head"><span class="ch-num">✜</span><span class="ch-name" data-i18n="navRosary">the rosary</span></div>
+        <p class="ch-sub" data-i18n="rosarySub">you found the cross at the foot of the frame. nine beads, nine doors — take it in your hand.</p>
+        <div id="rosary">
+          <canvas id="rc"></canvas>
+          <div id="beads"></div>
+          <div class="r-hook" aria-hidden="true"></div>
+          <div class="r-tools">
+            <button type="button" class="r-btn" id="btnSwing"><i class="fa-solid fa-hand-sparkles" aria-hidden="true"></i> <span data-i18n="push">give it a push</span></button>
+            <span class="r-hint" data-i18n="rosaryHint">drag a bead · let it fall</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="thumbTrack" aria-hidden="true"><div id="thumb"></div></div>
+
+  <!-- ═══════════ the cue ═══════════ -->
+  <button type="button" id="cue" data-i18n-label="cueAria" aria-label="Next section">
+    <span class="cue-txt" data-i18n="cue">scroll</span>
+    <span class="cue-line" aria-hidden="true"></span>
+  </button>
+
+  <!-- ═══════════ the curtain ═══════════ -->
+  <canvas id="curtain" aria-hidden="true"></canvas>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
   <script src="main.js"></script>
 </body>
 </html>
