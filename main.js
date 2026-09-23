@@ -11,6 +11,58 @@ const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const rand = (a, b) => a + Math.random() * (b - a);
 
 /* ═══════════════════════════════════════════════════════════════
+   PERF — how much this device can carry. Phones and weak machines
+   get the lite tier; a desktop that turns out to stutter is moved
+   there at runtime by the watch at the bottom of this file.
+   ?lite / ?full in the address force either tier.
+   ═══════════════════════════════════════════════════════════════ */
+const perf = (function () {
+  const q = new URLSearchParams(location.search);
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const small = Math.min(screen.width, screen.height) < 700;
+  const weak = (navigator.deviceMemory || 8) <= 2 || (navigator.hardwareConcurrency || 8) <= 2;
+  let lite = q.has('full') ? false : (q.has('lite') || coarse || small || weak || REDUCED);
+  const root = document.documentElement;
+  root.classList.toggle('lite', lite);
+  return {
+    get lite() { return lite; },
+    degrade() {
+      if (lite) return;
+      lite = true;
+      root.classList.add('lite');
+      document.dispatchEvent(new CustomEvent('perfchange'));
+    }
+  };
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   THE LOOP — one requestAnimationFrame for the whole site. Each
+   task returns true while it still has something to animate; when
+   none do, the loop stops and the page costs nothing until an
+   input wakes it again.
+   ═══════════════════════════════════════════════════════════════ */
+const loop = (function () {
+  const tasks = [];
+  let running = false;
+
+  function tick(now) {
+    let busy = false;
+    for (const fn of tasks) if (fn(now) === true) busy = true;
+    if (busy && !document.hidden) requestAnimationFrame(tick);
+    else running = false;
+  }
+  function wake() {
+    if (running || document.hidden) return;
+    running = true;
+    requestAnimationFrame(tick);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+  document.addEventListener('perfchange', wake);
+  addEventListener('resize', wake);
+  return { add(fn) { tasks.push(fn); wake(); }, wake };
+})();
+
+/* ═══════════════════════════════════════════════════════════════
    THE TONGUES — every string the site can speak.
    Add a locale by adding a block; anything it omits falls back
    to English, so a half-finished tongue is still safe to ship.
@@ -377,6 +429,7 @@ let loaded = false;
     // let the word "loading" be readable even on a fast connection
     const wait = Math.max(0, 620 - (performance.now() - started));
     setTimeout(() => { document.body.dataset.loaded = 'true'; }, wait + 260);
+    setTimeout(() => { $('#loader').style.display = 'none'; }, wait + 1200);
   };
 
   const target = () => imgs.length ? (done / imgs.length) * 100 : 100;
@@ -407,7 +460,10 @@ function enterSite() {
   audio.wake();
   audio.crack();
   document.body.dataset.entered = 'true';
-  setTimeout(() => $('#seal').setAttribute('tabindex', '-1'), 900);
+  loop.wake();
+  // once faded, take the seal out entirely — hidden elements still run
+  // their CSS animations, and the seal has four of them
+  setTimeout(() => { $('#seal').style.display = 'none'; }, 1000);
 }
 $('#seal').addEventListener('click', enterSite);
 
@@ -437,6 +493,7 @@ addEventListener('pointermove', e => {
   hand.ny = hand.y - 0.5;
   hand.moved = true;
   hand.last = performance.now();
+  loop.wake();
 }, { passive: true });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -445,10 +502,18 @@ addEventListener('pointermove', e => {
 (function scene() {
   const st = $('#scene');
   if (!st) return;
-  const els = $$('[data-depth]');
-  let cx = 0, cy = 0, drift = 0;
+  // transforms are written straight onto each element; an inherited
+  // custom property here would restyle every descendant on every frame
+  const els = $$('[data-depth]').map(el => ({ el, d: +el.dataset.depth, tf: el.dataset.tf || '', x: 1e9, y: 1e9 }));
+  let cx = 0, cy = 0, drift = 0, flat = false;
 
-  (function tick() {
+  loop.add(() => {
+    if (!entered || perf.lite) {
+      // a touch screen has no hovering hand to follow — the scene holds still
+      if (!flat) { for (const e of els) { e.el.style.transform = e.tf; e.x = e.y = 1e9; } flat = true; }
+      return false;
+    }
+    flat = false;
     // when the hand is still, the scene breathes on its own
     const idle = performance.now() - hand.last > 2600 || !hand.moved;
     let tx = hand.nx, ty = hand.ny;
@@ -460,14 +525,14 @@ addEventListener('pointermove', e => {
     cx += (tx - cx) * 0.055;
     cy += (ty - cy) * 0.055;
 
-    for (const el of els) {
-      const d = +el.dataset.depth;
-      el.style.setProperty('--px', (-cx * d).toFixed(2) + 'px');
-      el.style.setProperty('--py', (-cy * d * 0.6).toFixed(2) + 'px');
+    for (const e of els) {
+      const x = -cx * e.d, y = -cy * e.d * 0.6;
+      if (Math.abs(x - e.x) < 0.05 && Math.abs(y - e.y) < 0.05) continue;
+      e.x = x; e.y = y;
+      e.el.style.transform = 'translate3d(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px, 0) ' + e.tf;
     }
-    requestAnimationFrame(tick);
-  })();
-
+    return true;
+  });
 })();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -506,8 +571,13 @@ addEventListener('pointermove', e => {
     ctx.fill();
   }
 
-  let t = 0;
-  (function frame() {
+  let t = 0, cleared = true;
+  loop.add(() => {
+    if (!entered || perf.lite) {
+      if (!cleared) { ctx.clearRect(0, 0, W, H); cleared = true; }
+      return false;
+    }
+    cleared = false;
     resize();
     t += REDUCED ? 0 : 0.016;
     ctx.clearRect(0, 0, W, H);
@@ -525,8 +595,8 @@ addEventListener('pointermove', e => {
       if (p.star) star(p.x, p.y, p.r * 3.2);
       else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill(); }
     }
-    requestAnimationFrame(frame);
-  })();
+    return true;
+  });
 
 })();
 
@@ -536,12 +606,15 @@ addEventListener('pointermove', e => {
 (function lamp() {
   const el = $('#lamp');
   let x = innerWidth / 2, y = innerHeight * 0.4;
-  (function tick() {
-    x += (hand.x * innerWidth - x) * 0.09;
-    y += (hand.y * innerHeight - y) * 0.09;
+  loop.add(() => {
+    if (!entered || perf.lite) return false;
+    const tx = hand.x * innerWidth, ty = hand.y * innerHeight;
+    if (Math.abs(tx - x) < 0.3 && Math.abs(ty - y) < 0.3) return false;
+    x += (tx - x) * 0.09;
+    y += (ty - y) * 0.09;
     el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-    requestAnimationFrame(tick);
-  })();
+    return true;
+  });
 })();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -575,14 +648,15 @@ addEventListener('pointermove', e => {
 
   if (!REDUCED) {
     lit.style.setProperty('--lit', '.2');
-    (function drift() {
-      if (idle) {
+    loop.add(() => {
+      if (!entered || perf.lite || !idle || router.current !== 'home') return false;
+      {
         t += 0.0042;
         lit.style.setProperty('--mx', (50 + Math.sin(t) * 27 + Math.sin(t * 2.3) * 9).toFixed(2) + '%');
         lit.style.setProperty('--my', (42 + Math.cos(t * 0.83) * 22 + Math.sin(t * 1.7) * 7).toFixed(2) + '%');
       }
-      requestAnimationFrame(drift);
-    })();
+      return true;
+    });
   }
 })();
 
@@ -597,7 +671,7 @@ addEventListener('pointermove', e => {
   let scroll = 0;
 
   function resize() {
-    dpr = Math.min(devicePixelRatio || 1, 2);
+    dpr = perf.lite ? 1 : Math.min(devicePixelRatio || 1, 2);
     W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -605,19 +679,19 @@ addEventListener('pointermove', e => {
   }
 
   function seed() {
-    const n = W < 700 ? 34 : 64;
+    const n = perf.lite ? 18 : (W < 700 ? 34 : 64);
     motes = Array.from({ length: n }, () => ({
       x: Math.random() * W, y: Math.random() * H,
       r: rand(0.4, 1.5), vy: rand(-0.16, -0.04), vx: rand(-0.07, 0.07),
       a: rand(0.05, 0.28), ph: rand(0, 6.28), sp: rand(0.4, 1.5)
     }));
 
-    stars = Array.from({ length: W < 700 ? 10 : 20 }, () => ({
+    stars = Array.from({ length: perf.lite ? 7 : (W < 700 ? 10 : 20) }, () => ({
       x: Math.random() * W, y: Math.random() * H,
       r: rand(3, 9), ph: rand(0, 6.28), sp: rand(0.25, 0.8), a: rand(0.2, 0.6)
     }));
 
-    const cols = W < 700 ? 3 : 6;
+    const cols = perf.lite ? 2 : (W < 700 ? 3 : 6);
     strings = Array.from({ length: cols }, (_, i) => ({
       x: (i + 0.5) / cols * W + rand(-40, 40),
       len: rand(0.35, 0.95) * H,
@@ -637,10 +711,16 @@ addEventListener('pointermove', e => {
     ctx.fill();
   }
 
-  let t = 0;
-  (function frame() {
+  let t = 0, lastDraw = 0, tier = perf.lite;
+  loop.add(now => {
+    if (!entered) return false;
+    if (tier !== perf.lite) { tier = perf.lite; resize(); }
+    // on a phone the dust drifts at a film's frame rate, not the screen's
+    if (perf.lite && now - lastDraw < 40) return true;
+    const k = lastDraw ? Math.min((now - lastDraw) / 16.667, 3) : 1;
+    lastDraw = now;
     if (innerWidth !== W || innerHeight !== H) resize();
-    t += REDUCED ? 0 : 0.016;
+    t += REDUCED ? 0 : 0.016 * k;
     ctx.clearRect(0, 0, W, H);
 
     const ox = hand.nx * 14, oy = -scroll * 0.06 + hand.ny * 10;
@@ -670,7 +750,7 @@ addEventListener('pointermove', e => {
 
     motes.forEach(m => {
       if (!REDUCED) {
-        m.y += m.vy; m.x += m.vx + Math.sin(t * 0.5 + m.ph) * 0.08;
+        m.y += m.vy * k; m.x += (m.vx + Math.sin(t * 0.5 + m.ph) * 0.08) * k;
         if (m.y < -8) { m.y = H + 8; m.x = Math.random() * W; }
         if (m.x < -8) m.x = W + 8; else if (m.x > W + 8) m.x = -8;
       }
@@ -691,8 +771,8 @@ addEventListener('pointermove', e => {
       star(s.x + ox * 0.6, s.y + oy * 0.35, s.r * (0.25 + k * 0.25));
     });
 
-    requestAnimationFrame(frame);
-  })();
+    return true;
+  });
 
   addEventListener('resize', resize);
   addEventListener('scroll', () => { scroll = scrollY; }, { passive: true });
@@ -1035,6 +1115,7 @@ const rosary = (function () {
   }
 
   wrap.addEventListener('pointerdown', e => {
+    loop.wake();
     const { x, y } = local(e);
     const n = nearest(x, y);
     if (n.i < 0) return;
@@ -1082,28 +1163,30 @@ const rosary = (function () {
     audio.wake(); audio.clink(1.2);
   }
 
-  /* ── loop — sleeps while off screen ──────────────────────── */
-  if (window.IntersectionObserver) {
-    new IntersectionObserver(es => { live = es[0].isIntersecting; }, { rootMargin: '120px' }).observe(wrap);
-  }
+  /* ── loop — runs only while its sheet is actually shown ─────
+     (an IntersectionObserver cannot tell: the hidden sheets still
+     overlap the viewport, so the chain was simulated forever) */
+  const sheet = wrap.closest('.view');
 
   function frame(now) {
+    live = !!sheet && sheet.style.visibility === 'visible';
+    if (!live) { acc = 0; last = now; return false; }
     resize();
     const dt = Math.min(now - last, 60);
     last = now;
     t = now / 1000;
-    if (live && W > 2) {
+    if (W > 2) {
       acc += dt;
       let guard = 0;
       while (acc >= 16.667 && guard++ < 4) { step(); acc -= 16.667; }
       paint();
       place();
-    } else acc = 0;
-    requestAnimationFrame(frame);
+    }
+    return true;
   }
 
   resize();
-  requestAnimationFrame(frame);
+  loop.add(frame);
 
   $('#btnSwing').addEventListener('click', () => push());
 
@@ -1272,6 +1355,7 @@ const curtain = (function () {
     '}'
   ].join('\n');
 
+  const TAPS = perf.lite ? 3 : 5;   // smear samples per pixel
   const FS = [
     'precision highp float;',
     'varying vec2 vUv;',
@@ -1292,11 +1376,11 @@ const curtain = (function () {
     // the plate, dragged along the pan - five taps make the smear
     'vec3 smear(vec2 q, float amount) {',
     '  vec3 c = vec3(0.0);',
-    '  for (int i = 0; i < 5; i++) {',
-    '    float f = float(i) / 4.0;',
+    '  for (int i = 0; i < ' + TAPS + '; i++) {',
+    '    float f = float(i) / ' + (TAPS - 1) + '.0;',
     '    c += plate(vec2(q.x, q.y - f * amount));',
     '  }',
-    '  return c * 0.2;',
+    '  return c / ' + TAPS + '.0;',
     '}',
 
     'void main() {',
@@ -1386,11 +1470,11 @@ const curtain = (function () {
   else if (src) src.addEventListener('load', () => upload(src), { once: true });
 
   let W = 0, H = 0;
-  const QUALITY = 0.75;
   function resize() {
     const w = innerWidth, h = innerHeight;
     if (w < 2 || h < 2) return;
-    const q = Math.min(devicePixelRatio || 1, 1.6) * QUALITY;
+    // the wash is soft by nature — on a phone a quarter of the pixels will do
+    const q = perf.lite ? 0.5 : Math.min(devicePixelRatio || 1, 1.6) * 0.75;
     const nw = Math.round(w * q), nh = Math.round(h * q);
     if (nw === W && nh === H) return;
     W = nw; H = nh;
@@ -1405,31 +1489,35 @@ const curtain = (function () {
     gl.uniform2f(U.uTexO, ox, oy);
   }
   addEventListener('resize', resize);
+  document.addEventListener('perfchange', () => { W = 0; resize(); });
   resize();
 
   /* the liquid is drawn only while the camera moves */
   let flow = 0, shown = 0, pan = 0;
   const clock = () => performance.now() / 1000;
 
+  let drawn = false;
   function paint() {
-    resize();
     shown += (flow - shown) * (flow > shown ? 0.24 : 0.12);
     if (shown < 0.006) shown = 0;
-    if (hasTex && W > 2) {
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      if (shown > 0.004) {
-        gl.uniform1f(U.uTime, clock());
-        gl.uniform1f(U.uFlow, Math.min(shown, 0.40));
-        gl.uniform1f(U.uPan, pan);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-      }
+    if (!hasTex || W <= 2) return false;
+    if (shown === 0) {
+      // clear once on the way out, then leave the GPU alone
+      if (drawn) { gl.clear(gl.COLOR_BUFFER_BIT); drawn = false; }
+      return flow > 0;
     }
-    requestAnimationFrame(paint);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(U.uTime, clock());
+    gl.uniform1f(U.uFlow, Math.min(shown, 0.40));
+    gl.uniform1f(U.uPan, pan);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    drawn = true;
+    return true;
   }
-  requestAnimationFrame(paint);
+  loop.add(paint);
 
   return {
-    flow(speed, position) { flow = speed; pan = position; }
+    flow(speed, position) { flow = speed; pan = position; if (speed > 0) loop.wake(); }
   };
 })();
 
@@ -1456,9 +1544,10 @@ const router = (function () {
     });
   }
 
+  const secret = $('.tab-secret');
+  const OPEN = VIEWS.slice(), SHUT = VIEWS.slice(0, 3);
   function order() {
-    const secret = $('.tab-secret');
-    return (secret && secret.hidden) ? VIEWS.slice(0, 3) : VIEWS.slice();
+    return (secret && secret.hidden) ? SHUT : OPEN;
   }
 
   function apply(name) {
@@ -1591,6 +1680,13 @@ const glide = (function () {
   let pos = 0, target = 0, vel = 0, lastInput = 0, settled = true;
   let from = 0;            // the station the current gesture started at
   const GAP = 200;         // a pause this long ends a gesture
+  let dirty = true;        // something needs placing on the next frame
+
+  // the last value written to each sheet, so a frame at rest writes nothing
+  const seen = views.map(() => ({}));
+  const put = (el, c, prop, val) => { if (c[prop] !== val) { c[prop] = val; el.style[prop] = val; } };
+  let thumbH = '', thumbTop = '';
+  addEventListener('resize', () => { dirty = true; for (const c of seen) c.transform = null; });
 
   const count = () => router.order().length;
   const clampT = v => clamp(v, 0, count() - 1);
@@ -1603,6 +1699,8 @@ const glide = (function () {
     target = clampT(target + delta);
     lastInput = now;
     settled = false;
+    dirty = true;
+    loop.wake();
   }
 
   function goTo(i) {
@@ -1610,11 +1708,15 @@ const glide = (function () {
     from = target;
     lastInput = 0;
     settled = true;         // a named destination needs no settling
+    dirty = true;
+    loop.wake();
   }
 
   /* ── the camera ──────────────────────────────────────────── */
   function frame() {
-    const n = count();
+    if (!dirty) return false;
+    const order = router.order();
+    const n = order.length;
     if (target > n - 1) target = n - 1;
 
     // once the hand rests, fall onto a station. A deliberate flick
@@ -1634,35 +1736,36 @@ const glide = (function () {
     vel = pos - prev;
 
     const speed = Math.min(Math.abs(vel) * 34, 1);
+    const vh = innerHeight;
 
     // the sheets drift past one another
     for (let i = 0; i < views.length; i++) {
-      const v = views[i];
-      const idx = router.order().indexOf(v.dataset.view);
-      if (idx < 0) { v.style.visibility = 'hidden'; v.style.pointerEvents = 'none'; continue; }
-      const off = idx - pos;
+      const v = views[i], c = seen[i];
+      const idx = order.indexOf(v.dataset.view);
+      const off = idx < 0 ? 9 : idx - pos;
       const away = Math.abs(off);
-      v.style.setProperty('--off', off.toFixed(4));
       if (away >= 1.05) {
-        v.style.visibility = 'hidden';
-        v.style.pointerEvents = 'none';
-        v.style.opacity = '0';
+        put(v, c, 'visibility', 'hidden');
+        put(v, c, 'pointerEvents', 'none');
+        put(v, c, 'opacity', '0');
+        put(v, c, 'willChange', 'auto');
       } else {
-        v.style.visibility = 'visible';
-        v.style.opacity = Math.max(0, 1 - away * 1.28).toFixed(3);
-        v.style.pointerEvents = away < 0.32 ? 'auto' : 'none';
+        const moving = away > 0.0005;
+        put(v, c, 'visibility', 'visible');
+        put(v, c, 'opacity', Math.max(0, 1 - away * 1.28).toFixed(3));
+        put(v, c, 'pointerEvents', away < 0.32 ? 'auto' : 'none');
+        // its own compositor layer only while it is actually travelling
+        put(v, c, 'willChange', moving ? 'transform, opacity' : 'auto');
+        put(v, c, 'transform', moving ? 'translate3d(0, ' + (off * vh * 0.24).toFixed(1) + 'px, 0)' : 'none');
       }
     }
 
-    // the scene behind travels slower, the way a far wall does
-    if (sc) sc.style.setProperty('--sy', (-pos * 7).toFixed(2) + 'vh');
-
     // the thin rule on the right
     if (thumb && track) {
-      const n1 = Math.max(1, count() - 1);
-      const th = 100 / count();
-      thumb.style.height = th.toFixed(2) + '%';
-      thumb.style.top = ((pos / n1) * (100 - th)).toFixed(2) + '%';
+      const th = (100 / n).toFixed(2) + '%';
+      const tp = ((pos / Math.max(1, n - 1)) * (100 - 100 / n)).toFixed(2) + '%';
+      if (th !== thumbH) { thumbH = th; thumb.style.height = th; }
+      if (tp !== thumbTop) { thumbTop = tp; thumb.style.top = tp; }
     }
 
     // the wash belongs to the space between stations, where the sheets
@@ -1673,12 +1776,13 @@ const glide = (function () {
     }
 
     // tell the rest of the world which station is nearest
-    const near = router.order()[clamp(Math.round(pos), 0, count() - 1)];
+    const near = order[clamp(Math.round(pos), 0, n - 1)];
     if (near && near !== router.current) router.apply(near);
 
-    requestAnimationFrame(frame);
+    dirty = !settled || pos !== target;
+    return dirty;
   }
-  requestAnimationFrame(frame);
+  loop.add(frame);
 
   return {
     nudge, goTo,
@@ -1752,4 +1856,27 @@ const glide = (function () {
   }
   document.addEventListener('viewchange', markEnd);
   markEnd();
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   THE WATCH — measures the first couple of seconds after entering.
+   If this machine cannot hold ~38 fps with everything on, it is
+   moved to the lite tier without a word.
+   ═══════════════════════════════════════════════════════════════ */
+(function watch() {
+  if (perf.lite) return;
+  const gaps = [];
+  let from = 0, prev = 0, done = false;
+  loop.add(now => {
+    if (done || !entered || perf.lite) return false;
+    if (!from) { from = now + 1500; prev = now; return true; }   // let the entrance settle
+    if (now < from) { prev = now; return true; }
+    gaps.push(now - prev);
+    prev = now;
+    if (gaps.length < 120) return true;
+    done = true;
+    gaps.sort((a, b) => a - b);
+    if (gaps[60] > 26) perf.degrade();
+    return false;
+  });
 })();

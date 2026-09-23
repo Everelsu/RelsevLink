@@ -150,9 +150,7 @@ body[data-entered="true"] #seal { opacity: 0; visibility: hidden; pointer-events
   position: fixed; inset: 0; z-index: 1;
   overflow: hidden; pointer-events: none; background: #000;
 }
-.sc { position: absolute; inset: -6%; will-change: transform; }
-
-[data-depth] { transform: translate3d(var(--px, 0px), var(--py, 0px), 0); }
+.sc { position: absolute; inset: -6%; }
 
 .lyr {
   position: absolute; inset: 0;
@@ -161,17 +159,10 @@ body[data-entered="true"] #seal { opacity: 0; visibility: hidden; pointer-events
   will-change: transform;
   user-select: none; -webkit-user-drag: none;
 }
-.lyr-far {
-  transform: translate3d(var(--px,0px), var(--py,0px), 0) scale(1.18);
-  filter: blur(34px) grayscale(.8) brightness(.26) contrast(1.2);
-}
-.lyr-glow {
-  transform: translate3d(var(--px,0px), var(--py,0px), 0) scale(1.34);
-  filter: blur(70px) grayscale(1) brightness(1.35) contrast(.9);
-  mix-blend-mode: screen; opacity: .32;
-}
+/* the far wall and its glow are baked into scene.webp — no blur at runtime */
+.lyr-far { transform: scale(1.18); }
 .lyr-mid {
-  transform: translate3d(var(--px,0px), var(--py,0px), 0) scale(1.95) scaleX(-1);
+  transform: scale(1.95) scaleX(-1);
   transform-origin: 54% 34%;
   filter: blur(9px) grayscale(.85) brightness(.4) contrast(1.3);
   opacity: .28;
@@ -193,8 +184,6 @@ body[data-entered="true"] #seal { opacity: 0; visibility: hidden; pointer-events
 #embers { position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform; }
 
 @media (max-width: 640px) {
-  .lyr-far { filter: blur(22px) grayscale(.8) brightness(.2) contrast(1.25); }
-  .lyr-glow { filter: blur(44px) grayscale(1) brightness(1.15) contrast(.9); opacity: .22; }
   .lyr-mid { display: none; }
 }
 
@@ -417,8 +406,6 @@ body[data-entered="true"] #chrome { opacity: 1; transform: none; pointer-events:
   align-items: safe center;
   /* position and opacity are driven every frame by the glide */
   opacity: 0; visibility: hidden; pointer-events: none;
-  transform: translate3d(0, calc(var(--off, 0) * 24vh), 0);
-  will-change: transform, opacity;
 }
 body[data-entered="false"] .view { visibility: hidden !important; opacity: 0 !important; }
 
@@ -799,7 +786,7 @@ body.at-end #cue { opacity: 0; pointer-events: none; transition-delay: 0s; }
   background: linear-gradient(180deg, transparent, #dbe6f7);
   animation: drip 2.4s cubic-bezier(.6,0,.4,1) infinite;
 }
-@keyframes drip { 0% { top: -60%; } 65%, 100% { top: 100%; } }
+@keyframes drip { 0% { transform: translateY(0); } 65%, 100% { transform: translateY(267%); } }
 
 @media (max-height: 560px) { #cue { display: none; } }
 
@@ -861,6 +848,27 @@ body.no-curtain #curtain { display: none; }
   transition: opacity .35s ease, transform .45s var(--ease);
 }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ═══════════════════════════════════════════════════════════════
+   LITE — phones and weak machines. Everything that costs a full-
+   screen blend, a live blur or a second animated canvas goes; the
+   look stays, the heat does not.
+   ═══════════════════════════════════════════════════════════════ */
+html.lite .grain,
+html.lite #lamp,
+html.lite #embers,
+html.lite .lyr-mid { display: none; }
+html.lite .lyr-shaft { mix-blend-mode: normal; opacity: .45; }
+html.lite .lyr,
+html.lite .lockup,
+html.lite [data-depth] { will-change: auto; }
+html.lite * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.lite .status-line { background: rgba(6,8,11,.78); }
+html.lite .blabel, html.lite .r-btn, html.lite .ac-btn { background: rgba(8,10,13,.92); }
+/* rotating SVG children repaints the whole seal each frame; turn the
+   svg itself instead, which the compositor does for free */
+html.lite .s-ring * { animation: none !important; }
+html.lite .s-ring { animation: spin 110s linear infinite; }
 
 /* ═══════════ reduced motion ═══════════ */
 @media (prefers-reduced-motion: reduce) {
